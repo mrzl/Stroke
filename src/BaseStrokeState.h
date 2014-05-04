@@ -1,5 +1,7 @@
 #pragma once
 
+//#include 
+
 #include "ofxState.h"
 #include "ofxUI.h"
 
@@ -15,6 +17,7 @@ class BaseStrokeState : public itg::ofxState<SharedData>
 public:
 	virtual void setupIdea( int pointNum ) = 0;
 	virtual void setupImplementation() = 0;
+	virtual std::string getName() = 0;
 	std::string getTimestampForToday( std::string prefix );
 
 protected:
@@ -22,9 +25,9 @@ protected:
 	data data;
 
 	// gui
+	ofxUISuperCanvas * gui;
 	virtual void setupGUI() = 0;
 	virtual void guiEvent( ofxUIEventArgs &e ) = 0;
-	ofxUISuperCanvas *gui;
 
 	// logic
 	float pointNum;
