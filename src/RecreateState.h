@@ -23,6 +23,7 @@ private:
 	wng::ofxCsv pointsCsv;
 	std::vector< ofVec2f > points;
 
-	int currentPointIndex, currentPercentageX, currentPercentageY;
+	int currentPointIndex;
+	float currentPercentageX, currentPercentageY;
 };
 

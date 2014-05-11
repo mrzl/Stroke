@@ -3,8 +3,12 @@
 void RecreateState::stateEnter()
 {
 	loadPoints();
-	currentPointIndex = currentPercentageX = currentPercentageY = 0;
+	currentPercentageX = currentPercentageY = 0.0f;
+	currentPointIndex = 0;
+	
+	std::cout << "RecreateState" << std::endl;
 }
+
 
 void RecreateState::loadPoints()
 {
@@ -28,7 +32,6 @@ void RecreateState::loadPoints()
 
 void RecreateState::stateExit()
 {
-
 }
 
 void RecreateState::update()
@@ -36,11 +39,12 @@ void RecreateState::update()
 	ofVec2f fromPoint = points.at( currentPointIndex );
 	ofVec2f toPoint = points.at( currentPointIndex + 1 );
 	float distance = fromPoint.distance( toPoint );
-	int toAdd = ofMap( distance, 0, 3000, 3, 1 );
+	int toAdd = ofMap( distance, 0, 3000, 10, 1 );
 	
 
 	if( currentPercentageX >= 100 )
 	{
+		
 		if( currentPercentageY >= 100 )
 		{
 			currentPercentageX = 0;
@@ -93,5 +97,13 @@ float RecreateState::lerp( float start, float stop, float amt )
 
 void RecreateState::keyPressed( int key )
 {
-
+	switch( key ) 
+	{
+	case 'd':
+		changeState( getSharedData().DRAWING_STATE );
+		break;
+	case 'f':
+		changeState( getSharedData().FOLLOW_BALL_STATE );
+		break;
+	}
 }

@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "ofxState.h"
+#include "ofxUI.h"
 
 #include "SharedData.h"
 
@@ -25,6 +26,13 @@ public:
 private:
 	void saveRecordedMouseMovement();
 	void savePoints();
+	float currentlyDrawnPoints;
 	std::string getTimestampForToday( std::string prefix );
+
+	ofxUISuperCanvas *gui;
+	void guiEvent( ofxUIEventArgs &e );
+
+	void createRandomLines( int pointNum );
+	void addRandomLinesToExistingPoints( int pointNum );
 };
 

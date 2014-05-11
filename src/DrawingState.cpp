@@ -2,16 +2,36 @@
 
 void DrawingState::stateEnter()
 {
+	std::cout << "DrawingState" << std::endl;
+
 	getSharedData().mouseMovementCsvRecorder = wng::ofxCsv();
 	getSharedData().pointsCsvExporter = wng::ofxCsv();
 
 	getSharedData().mouseMovementCsvRecorder.clear();
 	getSharedData().pointsCsvExporter.clear();
+
+	currentlyDrawnPoints = 0.0f;
+
+	gui = new ofxUISuperCanvas( "VARIABLE BINDING" );
+
+	gui->addSpacer();
+	gui->addFPS();
+
+	gui->addSlider( "MOUSE RECORDINGS", 0, 255, &getSharedData().mouseMovementCsvRecorder.numRows );
+	gui->addSlider( "POINT RECORDINGS", 0, 255, &currentlyDrawnPoints );
+	gui->addSpacer(); 
+
+	gui->addLabelButton(getSharedData().FOLLOW_BALL_STATE, false);
+	gui->addLabelButton(getSharedData().RECREATE_STATE, false);
+
+	gui->autoSizeToFitWidgets();
+	ofAddListener( gui->newGUIEvent, this, &DrawingState::guiEvent );
+	gui->loadSettings("guiSettings.xml");
 }
 
 void DrawingState::stateExit()
 {
-
+	delete gui;
 }
 
 
@@ -40,13 +60,11 @@ void DrawingState::draw()
 		ofVec2f to = points->at( i + 1 );
 		ofLine( from, to );
 	}
-
-	ofDrawBitmapString("csv rows: " + ofToString(getSharedData().mouseMovementCsvRecorder.numRows), 500, 370);
 }
 
 std::string DrawingState::getName()
 {
-	return getSharedData().FOLLOW_BALL_STATE;
+	return getSharedData().DRAWING_STATE;
 }
 
 void DrawingState::mouseMoved( int x, int y )
@@ -61,7 +79,12 @@ void DrawingState::mouseMoved( int x, int y )
 
 void DrawingState::mouseReleased( int x, int y, int button )
 {
+
+	getSharedData().currentMousePos.x = x;
+	getSharedData().currentMousePos.y = y;
+
 	getSharedData().points.push_back( getSharedData().currentMousePos );
+	currentlyDrawnPoints = ( float )( getSharedData().points.size() );
 }
 
 void DrawingState::keyPressed( int key )
@@ -79,6 +102,9 @@ void DrawingState::keyPressed( int key )
 		break;
 	case 'r':
 		changeState( getSharedData().RECREATE_STATE );
+		break;
+	case 'u':
+		createRandomLines( 20 );
 		break;
 	}
 }
@@ -111,4 +137,39 @@ std::string DrawingState::getTimestampForToday( std::string prefix )
 	ss << ofGetTimestampString("%e%n%y-%H%M%S");
 	ss << ".csv";
 	return ss.str();
+}
+
+void DrawingState::guiEvent( ofxUIEventArgs &e )
+{
+	string name = e.widget->getName(); 
+	int kind = e.widget->getKind(); 
+
+	std::cout << name << " " << kind << std::endl;
+	changeState( name );
+
+	if( kind == OFX_UI_WIDGET_LABELBUTTON )
+	{
+		ofxUILabelButton *button = (ofxUILabelButton *) e.widget; 
+		std::cout << name << std::endl;
+		//changeState( name );
+	}
+}
+
+void DrawingState::createRandomLines( int pointNum )
+{
+	getSharedData().pointsCsvExporter.clear();
+	getSharedData().points.clear();
+
+	addRandomLinesToExistingPoints( pointNum );
+}
+
+void DrawingState::addRandomLinesToExistingPoints( int pointNum )
+{
+	for( int i = 0; i < pointNum; i++ ) 
+	{
+		float x = ofRandom( 0, ofGetWidth() );
+		float y = ofRandom( 0, ofGetHeight() );
+
+		mouseReleased( x, y, 0 );
+	}
 }

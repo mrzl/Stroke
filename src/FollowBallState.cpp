@@ -2,6 +2,7 @@
 
 void FollowBallState::stateEnter()
 {
+	std::cout << "FollowBallState" << std::endl;
 	loadPoints();
 
 	currentPointIndex = currentPercentage = 0;
@@ -73,15 +74,15 @@ void FollowBallState::draw()
 
 std::string FollowBallState::getName()
 {
-	return getSharedData().ANIMATION_STATE;
+	return getSharedData().FOLLOW_BALL_STATE;
 }
 
 void FollowBallState::keyPressed( int key )
 {
 	switch( key ) 
 	{
-	case 'c':
-		changeState( getSharedData().FOLLOW_BALL_STATE );
+	case 'r':
+		changeState( getSharedData().RECREATE_STATE );
 		break;
 	}
 }

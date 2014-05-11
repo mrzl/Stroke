@@ -15,6 +15,8 @@ struct data {
 class BaseStrokeState : public itg::ofxState<SharedData>
 {
 public:
+	void keyPressed( int key );
+
 	virtual void setupIdea( int pointNum ) = 0;
 	virtual void setupImplementation() = 0;
 	virtual std::string getName() = 0;
@@ -30,10 +32,14 @@ protected:
 	virtual void guiEvent( ofxUIEventArgs &e ) = 0;
 
 	// logic
-	float pointNum;
+
+	float * getPointCount( void );
 	bool running;
 
 	// misc
 	float lerp( float start, float stop, float amt );
+
+private:
+	float pointNum;
 };
 
