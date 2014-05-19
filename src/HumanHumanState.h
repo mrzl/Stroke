@@ -2,7 +2,7 @@
 
 #include "BaseStrokeState.h"
 
-class HumanComputerState : public BaseStrokeState
+class HumanHumanState : public BaseStrokeState
 {
 public:
 	void stateEnter();
@@ -12,26 +12,27 @@ public:
 	void draw();
 	void debugDraw();
 
-	std::string getName();
 	void setupIdea( int pointNum );
 	void setupImplementation();
+
+	std::string getName();
 	void setupGUI();
 	void guiEvent( ofxUIEventArgs &e );
-
 	void mouseMoved( int x, int y );
+	void mousePressed( int x, int y, int key );
 	void mouseReleased( int x, int y, int button );
 	void keyPressed( int key );
 
 private:
-	bool recording, allowParallels;
+	bool recording, recorded, allowParallels;
 	std::string setupIdeaButtonLabel, setupImplementationButtonLabel, startAnimationButtonLabel, allowParallelsButtonLabel;
 	float animationSpeed;
+	int currentPointIndex;
+	int currentDrawingIndex, currentMouseDataIndex;
 
 	ofVec2f currentMouse;
 	ofVec2f getCurrentMouse();
 
-	// animation
-	int currentPointIndex;
-	float currentPercentageX, currentPercentageY;
+	std::vector<std::vector<ofVec2f>> mouseData;
 };
 

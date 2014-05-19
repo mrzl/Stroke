@@ -24,6 +24,5 @@ public:
 		
 
 private:
-
 	itg::ofxStateMachine<SharedData> stateMachine;
 };

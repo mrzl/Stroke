@@ -40,3 +40,15 @@ float * BaseStrokeState::getPointCount( void )
 {
 	return &this->pointNum;
 }
+
+void BaseStrokeState::setupPointCount(int pointCount)
+{
+	*this->getPointCount() = pointNum;
+}
+
+void BaseStrokeState::setupColors()
+{
+	ofBackground( getSharedData().backgroundColor );
+	ofSetColor( getSharedData().lineColor );
+	glLineWidth( getSharedData().strokeWeight );
+}

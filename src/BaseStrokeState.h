@@ -20,6 +20,8 @@ public:
 	virtual void setupIdea( int pointNum ) = 0;
 	virtual void setupImplementation() = 0;
 	virtual std::string getName() = 0;
+	void setupPointCount( int pointCount );
+	void setupColors();
 	std::string getTimestampForToday( std::string prefix );
 
 protected:

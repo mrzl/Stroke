@@ -2,7 +2,7 @@
 
 void ComputerComputerState::stateEnter()
 {
-	*getPointCount() = 100.0f;
+	BaseStrokeState::setupPointCount( 100 );
 	running = false;
 	animationSpeed = 10.0f;
 
@@ -104,11 +104,10 @@ void ComputerComputerState::update()
 
 void ComputerComputerState::draw()
 {
+	BaseStrokeState::setupColors();
+
 	if( running && this->data.pointData.size() >= currentPointIndex + 1)
 	{
-		ofBackground( ofColor( 0 ) );
-		glLineWidth( 2 );
-		ofSetColor( ofColor( 255 ) );
 		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
 		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
 		float percentageX = currentPercentageX / 100.0;
@@ -122,7 +121,12 @@ void ComputerComputerState::draw()
 		{
 			ofVec2f from = this->data.pointData.at( i );
 			ofVec2f to = this->data.pointData.at( i + 1 );
+			from.limited( from.length() - 2 );
+			from += (to - from).getNormalized() * 2 / 2;
+			to += (from - to).getNormalized() * 2;
 			ofLine( from, to );
+			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 	}
 	else 
@@ -133,16 +137,16 @@ void ComputerComputerState::draw()
 
 void ComputerComputerState::debugDraw()
 {
-
-	ofBackground( ofColor( 0 ) );
-	ofSetColor( ofColor( 255, 255, 255, 100 ) );
-	glLineWidth( 1 );
-
 	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
 	{
 		ofVec2f from = this->data.pointData.at( i );
 		ofVec2f to = this->data.pointData.at( i + 1 );
+		from.limited( from.length() - 2 );
+		from += (to - from).getNormalized() * 2 / 2;
+		to += (from - to).getNormalized() * 2;
 		ofLine( from, to );
+		ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+		ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 	}
 }
 

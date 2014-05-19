@@ -3,6 +3,7 @@
 
 void HumanComputerState::stateEnter()
 {
+	BaseStrokeState::setupPointCount( 100 );
 	this->recording = false;
 	running = false;
 	this->allowParallels = true;
@@ -56,11 +57,9 @@ void HumanComputerState::update()
 
 void HumanComputerState::draw()
 {
+	BaseStrokeState::setupColors();
 	if( running && this->data.pointData.size() > currentPointIndex + 1)
 	{
-		ofBackground( ofColor( 0 ) );
-		glLineWidth( 2 );
-		ofSetColor( ofColor( 255 ) );
 		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
 		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
 		float percentageX = currentPercentageX / 100.0;
@@ -68,28 +67,41 @@ void HumanComputerState::draw()
 		float lerpedX, lerpedY;
 		lerpedX = lerp( fromPoint.x, toPoint.x, percentageX );
 		lerpedY = lerp( fromPoint.y, toPoint.y, percentageY );
-		ofLine( fromPoint, ofVec2f( lerpedX, lerpedY ) );
+		ofVec2f toLerped( lerpedX, lerpedY );
+		ofLine( fromPoint, toLerped );
+		fromPoint.limited( fromPoint.length() - 2 );
+		fromPoint += (toLerped - fromPoint).getNormalized() * 2 / 2;
+		toLerped += (fromPoint - toLerped).getNormalized() * 2;
+		ofLine( fromPoint, toLerped );
+		ofEllipse( fromPoint, getSharedData().strokeWeight, getSharedData().strokeWeight );
+		ofEllipse( toLerped, getSharedData().strokeWeight, getSharedData().strokeWeight );
 
 		for( size_t i = 0; i < currentPointIndex && this->data.pointData.size() > 1; i++ ) 
 		{
 			ofVec2f from = this->data.pointData.at( i );
 			ofVec2f to = this->data.pointData.at( i + 1 );
+			from.limited( from.length() - 2 );
+			from += (to - from).getNormalized() * 2 / 2;
+			to += (from - to).getNormalized() * 2;
 			ofLine( from, to );
+			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 	}
 
 	if( allowParallels && recording && !running )
 	{
 		debugDraw();
-		std::cout << "0" << std::endl;
 		if( this->data.pointData.size() > 0 )
 		{
-			std::cout << "1/2" << std::endl;
 			ofVec2f from = this->data.pointData.at( this->data.pointData.size() - 1 );
-			std::cout << "1" << std::endl;
 			ofVec2f to = this->getCurrentMouse();
-			std::cout << "2" << std::endl;
+			from.limited( from.length() - 2 );
+			from += (to - from).getNormalized() * 2 / 2;
+			to += (from - to).getNormalized() * 2;
 			ofLine( from, to );
+			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 
 	} 
@@ -101,15 +113,16 @@ void HumanComputerState::draw()
 
 void HumanComputerState::debugDraw()
 {
-	//ofBackground( ofColor( 0 ) );
-	ofSetColor( ofColor( 255, 255, 255, 100 ) );
-	glLineWidth( 1 );
-
 	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
 	{
 		ofVec2f from = this->data.pointData.at( i );
 		ofVec2f to = this->data.pointData.at( i + 1 );
+		from.limited( from.length() - 2 );
+		from += (to - from).getNormalized() * 2 / 2;
+		to += (from - to).getNormalized() * 2;
 		ofLine( from, to );
+		ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+		ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 	}
 }
 
@@ -133,7 +146,7 @@ void HumanComputerState::setupImplementation()
 void HumanComputerState::setupGUI()
 {
 	setupIdeaButtonLabel = "SETUP_IDEA";
-	setupImplementationButtonLabel = "SETUP IMPLEMENTATION (f)";
+	setupImplementationButtonLabel = "SETUP IMPLEMENTATION (a)";
 	startAnimationButtonLabel = "START ANIMATION";
 	allowParallelsButtonLabel = "ALLOW_PARALLELS (p)";
 
@@ -219,7 +232,7 @@ void HumanComputerState::keyPressed( int key )
 	BaseStrokeState::keyPressed( key );
 	switch( key )
 	{
-	case 'f':
+	case 'a':
 		setupImplementation();
 		break;
 	case 'p':

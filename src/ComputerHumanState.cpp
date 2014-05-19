@@ -3,11 +3,11 @@
 
 void ComputerHumanState::stateEnter()
 {
+	BaseStrokeState::setupPointCount( 100 );
 	currentPointIndex = 0;
 	currentDrawingIndex = 0;
 	currentMouseDataIndex = 0;
 	animationSpeed = 1;
-	*getPointCount() = 100.0f;
 	running = false;
 	recording = false;
 	
@@ -34,25 +34,25 @@ void ComputerHumanState::update()
 
 void ComputerHumanState::draw()
 {
-	std::cout << "draw" << std::endl;
-	ofBackground( 0 );
-
+	BaseStrokeState::setupColors();
 	if( recording )
 	{
 		ofSetColor( 0, 255, 0 );
-		glLineWidth( 5 );
+		glLineWidth( getSharedData().strokeWeight );
 		ofCircle( this->data.pointData.at( currentPointIndex ).x, this->data.pointData.at( currentPointIndex ).y, 10, 10 );
 	}	
 	else if( recorded )
 	{
-		ofSetColor( ofColor( 255, 255, 255, 100 ) );
-		glLineWidth( 1 );
-
 		for( size_t i = 0; i < currentDrawingIndex; i++ ) 
 		{
 			ofVec2f from = this->data.pointData.at( i );
 			ofVec2f to = this->data.pointData.at( i + 1 );
+			from.limited( from.length() - 2 );
+			from += (to - from).getNormalized() * 2 / 2;
+			to += (from - to).getNormalized() * 2;
 			ofLine( from, to );
+			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 		
 		ofVec2f from = this->data.pointData.at( currentDrawingIndex );
@@ -68,7 +68,12 @@ void ComputerHumanState::draw()
 		if( currentMouseDataIndex > 0)
 		{
 			ofVec2f to = this->mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
-			ofLine( from , to );
+			from.limited( from.length() - 2 );
+			from += (to - from).getNormalized() * 2 / 2;
+			to += (from - to).getNormalized() * 2;
+			ofLine( from, to );
+			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 		
 		/*
@@ -85,14 +90,19 @@ void ComputerHumanState::draw()
 	}
 	if( !recorded )
 	{
-		ofSetColor( ofColor( 255, 255, 255, 100 ) );
-		glLineWidth( 1 );
+		ofSetColor( getSharedData().lineColor );
+		glLineWidth( getSharedData().strokeWeight );
 
 		for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
 		{
 			ofVec2f from = this->data.pointData.at( i );
 			ofVec2f to = this->data.pointData.at( i + 1 );
+			from.limited( from.length() - 2 );
+			from += (to - from).getNormalized() * 2 / 2;
+			to += (from - to).getNormalized() * 2;
 			ofLine( from, to );
+			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
+			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 	}
 }

@@ -16,4 +16,7 @@ public:
 	std::string COMPUTER_COMPUTER, COMPUTER_HUMAN, HUMAN_COMPUTER, HUMAN_HUMAN;
 
 	std::string stateSelectionRadioButton;
+
+	ofColor backgroundColor, lineColor;
+	int strokeWeight;
 };

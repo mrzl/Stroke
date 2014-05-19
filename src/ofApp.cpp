@@ -6,6 +6,7 @@
 #include "ComputerComputerState.h"
 #include "ComputerHumanState.h"
 #include "HumanComputerState.h"
+#include "HumanHumanState.h"
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -13,10 +14,6 @@ void ofApp::setup(){
 	ofEnableSmoothing();
 	ofEnableAlphaBlending();
 	ofSetVerticalSync(true);
-
-	stateMachine.getSharedData().DRAWING_STATE = "DRAWING_STATE";
-	stateMachine.getSharedData().FOLLOW_BALL_STATE = "FOLLOW_BALL_STATE";
-	stateMachine.getSharedData().RECREATE_STATE= "RECREATE_STATE";
 
 	stateMachine.getSharedData().COMPUTER_COMPUTER = "COMPUTER_COMPUTER";
 	stateMachine.getSharedData().COMPUTER_HUMAN = "COMPUTER_HUMAN";
@@ -28,13 +25,14 @@ void ofApp::setup(){
 
 	stateMachine.getSharedData().stateSelectionRadioButton = "STATE";
 
-	//stateMachine.addState<DrawingState>();
-	//stateMachine.addState<FollowBallState>();
-	//stateMachine.addState<RecreateState>();
+	stateMachine.getSharedData().backgroundColor = ofColor( 255, 255, 255 );
+	stateMachine.getSharedData().lineColor = ofColor( 0, 0, 0 );
+	stateMachine.getSharedData().strokeWeight = 5;
 
 	stateMachine.addState<ComputerComputerState>();
 	stateMachine.addState<ComputerHumanState>();
 	stateMachine.addState<HumanComputerState>();
+	stateMachine.addState<HumanHumanState>();
 
 	stateMachine.changeState(stateMachine.getSharedData().COMPUTER_COMPUTER);
 
@@ -53,12 +51,16 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-
+	switch(key)
+	{
+	case 'f':
+		ofToggleFullscreen();
+		break;
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
-
 }
 
 //--------------------------------------------------------------
