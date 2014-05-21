@@ -3,8 +3,10 @@
 void ComputerComputerState::stateEnter()
 {
 	BaseStrokeState::setupPointCount( 100 );
-	running = false;
+	//running = false;
+	this->state = INIT;
 	animationSpeed = 10.0f;
+	
 
 	currentPercentageX = currentPercentageY = 0.0f;
 	currentPointIndex = 0;
@@ -37,7 +39,7 @@ void ComputerComputerState::setupGUI()
 	gui->addSpacer();
 	gui->addLabelButton( this->setupIdeaButtonLabel, false );
 	gui->addSpacer();
-	exportFileNameTextInput = gui->addTextInput( exportFileNameButtonLabel, getTimestampForToday( "points_") );
+	exportFileNameTextInput = gui->addTextInput( exportFileNameButtonLabel, "REMOVETHIS" );
 	gui->addLabelButton( this->exportIdeaButtonLabel, false );
 	gui->addSpacer();
 	importFileNameDropDownList = gui->addDropDownList( this->importFileNameDropdownLabel, getAvailableSavedIdeas() );
@@ -71,7 +73,7 @@ void ComputerComputerState::stateExit()
 
 void ComputerComputerState::update()
 {
-	if( running && this->data.pointData.size() >= currentPointIndex + 1 )
+	if( this->state == RUNNING && this->data.pointData.size() >= currentPointIndex + 1 )
 	{
 		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
 		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
@@ -106,7 +108,7 @@ void ComputerComputerState::draw()
 {
 	BaseStrokeState::setupColors();
 
-	if( running && this->data.pointData.size() >= currentPointIndex + 1)
+	if( this->state == RUNNING && this->data.pointData.size() >= currentPointIndex + 1)
 	{
 		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
 		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
@@ -214,7 +216,14 @@ void ComputerComputerState::guiEvent( ofxUIEventArgs &e )
 		}
 		else if ( name == this->startAnimationButtonLabel )
 		{
-			running = !running;
+			switch( this->state )
+			{
+			case RUNNING:
+				this->state = INIT;
+				break;
+			case INIT:
+				this->state = RUNNING;
+			}
 			currentPercentageX = currentPercentageY = 0.0f;
 			currentPointIndex = 0;
 		}
@@ -232,7 +241,6 @@ void ComputerComputerState::importIdea( std::string filePath )
 	wng::ofxCsv * pointDataImporter = new wng::ofxCsv();
 	pointDataImporter->loadFile( ofToDataPath( "saved/" + filePath ) );
 	this->data.pointData.clear();
-	this->data.mouseData.clear();
 	for( auto it = pointDataImporter->data.begin(); it != pointDataImporter->data.end(); ++it ) 
 	{
 		std::vector<std::string> * pointS = &( * it );
@@ -257,7 +265,7 @@ void ComputerComputerState::exportIdea( std::string fileName )
 {
 	wng::ofxCsv * pointDataExporter = new wng::ofxCsv();
 	this->data.pointData.clear();
-	this->data.mouseData.clear();
+	//this->data.mouseData.clear();
 	for( auto it = this->data.pointData.begin(); it != this->data.pointData.end(); ++it ) 
 	{
 		ofVec2f recordedPoints = *it;

@@ -4,18 +4,18 @@
 void HumanHumanState::stateEnter()
 {
 	BaseStrokeState::setupPointCount( 100 );
-	this->recording = false;
-	running = false;
+	this->state = INIT;
 	this->allowParallels = true;
 	animationSpeed = 0.0f;
 	currentPointIndex = 0;
 	currentDrawingIndex = 0;
 	currentMouseDataIndex = 0;
+	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
 	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
 	
-	if( this->data.mouseData.empty() )
+	//if( this->data.mouseData.empty() )
 	{
-		recorded = false;
+		this->state = INIT;
 	}
 
 	setupGUI();
@@ -29,13 +29,12 @@ void HumanHumanState::stateExit()
 
 void HumanHumanState::setupIdea( int pointNum )
 {
-	this->recording = true;
+	this->state = RECORDING;
 }
 
 void HumanHumanState::setupImplementation()
 {
-	this->recording = false;
-	this->recorded = true;
+	this->state = DONE;
 }
 
 std::string HumanHumanState::getName()
@@ -96,7 +95,14 @@ void HumanHumanState::guiEvent(ofxUIEventArgs &e)
 
 		else if ( name == this->startAnimationButtonLabel )
 		{
-			running = !running;
+			switch( this->state )
+			{
+			case RUNNING:
+				this->state = INIT;
+				break;
+			case INIT:
+				this->state = RECORDING;
+			}
 			currentPointIndex = 0;
 		}
 		else if( name == this->allowParallelsButtonLabel )
@@ -115,13 +121,13 @@ void HumanHumanState::guiEvent(ofxUIEventArgs &e)
 void HumanHumanState::mouseMoved(int x, int y)
 {
 	this->currentMouse = ofVec2f( x, y );
-	if( recording )
+	if( this->state == RECORDING )
 	{
 		ofVec2f v( x, y );
 		if( currentPointIndex > 0 )
 		{
-			this->data.mouseData.push_back( v );
-			this->mouseData[currentPointIndex - 1].push_back( v );
+			//this->data.mouseData.push_back( v );
+			this->data.mouseData[currentPointIndex - 1].push_back( v );
 		}
 	}
 }
@@ -132,9 +138,12 @@ void HumanHumanState::mousePressed(int x, int y, int key)
 
 void HumanHumanState::mouseReleased(int x, int y, int button)
 {
-	this->mouseData.resize( currentPointIndex + 1 );
-	this->data.pointData.push_back( ofVec2f( x, y ) );
-	currentPointIndex++;
+	if( this->state == RECORDING )
+	{
+		this->data.mouseData.resize( currentPointIndex + 1 );
+		this->data.pointData.push_back( ofVec2f( x, y ) );
+		currentPointIndex++;
+	}
 }
 
 
@@ -155,7 +164,7 @@ void HumanHumanState::keyPressed(int key)
 
 void HumanHumanState::update()
 {
-	if( recorded )
+	if( this->state == DONE )
 	{
 		currentMouseDataIndex += animationSpeed;
 	}
@@ -164,7 +173,7 @@ void HumanHumanState::update()
 void HumanHumanState::draw()
 {
 	BaseStrokeState::setupColors();
-	if( allowParallels && recording && !recorded )
+	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();
 		if( this->data.pointData.size() > 0 )
@@ -180,12 +189,12 @@ void HumanHumanState::draw()
 		}
 
 	} 
-	if(recording && !recorded ) 
+	if( this->state == RECORDING ) 
 	{
 		debugDraw();
 	}
 
-	if( recorded && !recording )
+	if( this->state == DONE )
 	{
 
 		for( size_t i = 0; i < currentDrawingIndex; i++ ) 
@@ -201,7 +210,7 @@ void HumanHumanState::draw()
 		}
 
 		
-		if( currentMouseDataIndex > this->mouseData.at(currentDrawingIndex).size() - 1 )
+		if( currentMouseDataIndex > this->data.mouseData.at(currentDrawingIndex).size() - 1 )
 		{
 			currentDrawingIndex++;
 			if( currentDrawingIndex + 1 >= this->data.pointData.size() )
@@ -213,7 +222,7 @@ void HumanHumanState::draw()
 		if( currentMouseDataIndex > 0)
 		{
 			ofVec2f from = this->data.pointData.at( currentDrawingIndex );
-			ofVec2f to = this->mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
+			ofVec2f to = this->data.mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;

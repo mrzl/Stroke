@@ -23,7 +23,7 @@ public:
 	void keyPressed( int key );
 
 private:
-	bool recording, allowParallels;
+	bool allowParallels;
 	std::string setupIdeaButtonLabel, setupImplementationButtonLabel, startAnimationButtonLabel, allowParallelsButtonLabel;
 	float animationSpeed;
 

@@ -24,9 +24,7 @@ private:
 
 	std::string setupIdeaButtonLabel, setupImplementationButtonLabel;
 
-	bool recording, recorded;
 	int currentPointIndex, currentDrawingIndex, currentMouseDataIndex;
 	float animationSpeed;
-	std::vector<std::vector<ofVec2f>> mouseData;
 };
 

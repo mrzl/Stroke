@@ -8,18 +8,18 @@ void ComputerHumanState::stateEnter()
 	currentDrawingIndex = 0;
 	currentMouseDataIndex = 0;
 	animationSpeed = 1;
-	running = false;
-	recording = false;
+	this->state = INIT;
+	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
 	
-	if( this->data.mouseData.empty() )
+	//if( this->data.mouseData.empty() )
 	{
-		recorded = false;
+		//recorded = false;
 	}
 
 	setupGUI();
 	gui->setVisible( true );
 
-	this->mouseData.resize( *getPointCount() );
+	this->data.mouseData.resize( *getPointCount() );
 }
 
 void ComputerHumanState::stateExit()
@@ -35,13 +35,14 @@ void ComputerHumanState::update()
 void ComputerHumanState::draw()
 {
 	BaseStrokeState::setupColors();
-	if( recording )
+	if( this->state == RECORDING )
 	{
 		ofSetColor( 0, 255, 0 );
 		glLineWidth( getSharedData().strokeWeight );
 		ofCircle( this->data.pointData.at( currentPointIndex ).x, this->data.pointData.at( currentPointIndex ).y, 10, 10 );
 	}	
-	else if( recorded )
+	
+	if( this->state == DONE )
 	{
 		for( size_t i = 0; i < currentDrawingIndex; i++ ) 
 		{
@@ -56,7 +57,7 @@ void ComputerHumanState::draw()
 		}
 		
 		ofVec2f from = this->data.pointData.at( currentDrawingIndex );
-		if( currentMouseDataIndex > this->mouseData.at(currentDrawingIndex).size() - 1 )
+		if( currentMouseDataIndex > this->data.mouseData.at(currentDrawingIndex).size() - 1 )
 		{
 			currentDrawingIndex++;
 			if( currentDrawingIndex + 1 >= this->data.pointData.size() )
@@ -67,7 +68,7 @@ void ComputerHumanState::draw()
 		}
 		if( currentMouseDataIndex > 0)
 		{
-			ofVec2f to = this->mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
+			ofVec2f to = this->data.mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -88,7 +89,7 @@ void ComputerHumanState::draw()
 		}
 		*/
 	}
-	if( !recorded )
+	if( !(this->state == DONE) )
 	{
 		ofSetColor( getSharedData().lineColor );
 		glLineWidth( getSharedData().strokeWeight );
@@ -109,13 +110,13 @@ void ComputerHumanState::draw()
 
 void ComputerHumanState::mouseMoved( int x, int y )
 {
-	if( recording )
+	if( this->state == RECORDING )
 	{
 		ofVec2f v( x, y );
 		if( currentPointIndex > 0 )
 		{
-			this->data.mouseData.push_back( v );
-			this->mouseData[currentPointIndex - 1].push_back( v );
+			//this->data.mouseData.push_back( v );
+			this->data.mouseData[currentPointIndex - 1].push_back( v );
 		}
 
 		float dist = v.distance( this->data.pointData.at( currentPointIndex ) );
@@ -123,8 +124,7 @@ void ComputerHumanState::mouseMoved( int x, int y )
 		{
 			if( currentPointIndex == this->data.pointData.size() - 1 )
 			{
-				recording = false;
-				recorded = true;
+				this->state = DONE;
 			}
 			else 
 			{
@@ -151,14 +151,13 @@ std::string ComputerHumanState::getName()
 
 void ComputerHumanState::setupIdea( int numPoints )
 {
-	this->recorded = false;
-	this->recording = false;
+	this->state = RUNNING;
 	this->data.pointData.clear();
-	this->mouseData.clear();
+	this->data.mouseData.clear();
 	currentMouseDataIndex = 0;
 	currentPointIndex = 0;
 	currentDrawingIndex = 0;
-	this->mouseData.resize( numPoints );
+	this->data.mouseData.resize( numPoints );
 
 	for( int i = 0; i < *getPointCount(); i++ ) 
 	{
@@ -201,9 +200,8 @@ void ComputerHumanState::setupGUI()
 
 void ComputerHumanState::setupImplementation()
 {
-	recording = true;
-	recorded = false;
-	this->data.mouseData.clear();
+	this->state = RECORDING;
+	//this->data.mouseData.clear();
 }
 
 void ComputerHumanState::guiEvent( ofxUIEventArgs &e )

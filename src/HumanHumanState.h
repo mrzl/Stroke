@@ -24,7 +24,7 @@ public:
 	void keyPressed( int key );
 
 private:
-	bool recording, recorded, allowParallels;
+	bool allowParallels;
 	std::string setupIdeaButtonLabel, setupImplementationButtonLabel, startAnimationButtonLabel, allowParallelsButtonLabel;
 	float animationSpeed;
 	int currentPointIndex;
@@ -32,7 +32,5 @@ private:
 
 	ofVec2f currentMouse;
 	ofVec2f getCurrentMouse();
-
-	std::vector<std::vector<ofVec2f>> mouseData;
 };
 

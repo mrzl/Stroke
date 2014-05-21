@@ -4,11 +4,12 @@
 void HumanComputerState::stateEnter()
 {
 	BaseStrokeState::setupPointCount( 100 );
-	this->recording = false;
-	running = false;
+	//this->recording = false;
+	this->state = INIT;
 	this->allowParallels = true;
 	animationSpeed = 0.0f;
 	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
+	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
 
 	currentPercentageX = currentPercentageY = 0.0f;
 	currentPointIndex = 0;
@@ -24,7 +25,7 @@ void HumanComputerState::stateExit()
 
 void HumanComputerState::update()
 {
-	if( running && this->data.pointData.size() > currentPointIndex + 1 )
+	if( this->state == RUNNING && this->data.pointData.size() > currentPointIndex + 1 )
 	{
 		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
 		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
@@ -58,7 +59,7 @@ void HumanComputerState::update()
 void HumanComputerState::draw()
 {
 	BaseStrokeState::setupColors();
-	if( running && this->data.pointData.size() > currentPointIndex + 1)
+	if( this->state == RUNNING && this->data.pointData.size() > currentPointIndex + 1)
 	{
 		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
 		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
@@ -89,7 +90,7 @@ void HumanComputerState::draw()
 		}
 	}
 
-	if( allowParallels && recording && !running )
+	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();
 		if( this->data.pointData.size() > 0 )
@@ -105,7 +106,7 @@ void HumanComputerState::draw()
 		}
 
 	} 
-	if(recording && !running ) 
+	if( this->state == RECORDING ) 
 	{
 		debugDraw();
 	}
@@ -134,13 +135,12 @@ std::string HumanComputerState::getName()
 
 void HumanComputerState::setupIdea( int pointNum )
 {
-	recording = true;
+	this->state = RECORDING;
 }
 
 void HumanComputerState::setupImplementation()
 {
-	this->recording = false;
-	this->running = true;
+	this->state = RUNNING;
 }
 
 void HumanComputerState::setupGUI()
@@ -196,7 +196,14 @@ void HumanComputerState::guiEvent( ofxUIEventArgs &e )
 		
 		else if ( name == this->startAnimationButtonLabel )
 		{
-			running = !running;
+			switch( this->state )
+			{
+			case RUNNING:
+				this->state = INIT;
+				break;
+			case INIT:
+				this->state = RECORDING;
+			}
 			currentPercentageX = currentPercentageY = 0.0f;
 			currentPointIndex = 0;
 		}
@@ -220,7 +227,11 @@ void HumanComputerState::mouseMoved( int x, int y )
 
 void HumanComputerState::mouseReleased( int x, int y, int button )
 {
-	this->data.pointData.push_back( ofVec2f( x, y ) );
+	if( this->state == RECORDING )
+	{
+		this->data.pointData.push_back( ofVec2f( x, y ) );
+	}
+	
 	if( this->data.pointData.size() > *this->getPointCount() )
 	{
 		//recording = false;
