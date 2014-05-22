@@ -12,14 +12,15 @@
 
 #include "SharedData.h"
 
-struct data {
-	std::vector< ofVec2f > pointData;
-	std::vector< std::vector< ofVec2f > > mouseData;
-};
+
 
 class BaseStrokeState : public itg::ofxState<SharedData>
 {
 public:
+    struct data {
+        std::vector< ofVec2f > pointData;
+        std::vector< std::vector< ofVec2f > > mouseData;
+    };
 	void keyPressed( int key );
 
 	virtual void setupIdea( int pointNum ) = 0;
@@ -36,7 +37,7 @@ public:
 
 protected:
 	// data
-	data data;
+	BaseStrokeState::data data;
 
 	// gui
 	ofxUISuperCanvas * gui;

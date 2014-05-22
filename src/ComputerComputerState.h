@@ -5,9 +5,6 @@
 #include "ofxUI.h"
 #include "ofxCsv.h"
 
-#include < map >
-
-
 class ComputerComputerState : public BaseStrokeState
 {
 public:
@@ -36,11 +33,11 @@ private:
 	ofxUIDropDownList * importFileNameDropDownList;
 	ofxUITextInput * exportFileNameTextInput;
 	std::string setupIdeaButtonLabel, importIdeaButtonLabel, exportIdeaButtonLabel, exportFileNameButtonLabel, importFileNameDropdownLabel, startAnimationButtonLabel;
-	
+
 	// animation
 	int currentPointIndex;
 	float currentPercentageX, currentPercentageY;
-	
+
 	float animationSpeed;
 
 	// misc

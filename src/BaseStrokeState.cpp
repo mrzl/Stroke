@@ -10,7 +10,7 @@ void BaseStrokeState::keyPressed( int key )
 	switch( key )
 	{
 	case 'g':
-		gui->toggleVisible(); 
+		gui->toggleVisible();
 		break;
 	case 'e':
 		this->exportPointData();
@@ -33,7 +33,7 @@ void BaseStrokeState::keyPressed( int key )
 		break;
 	case '4':
 		changeState( getSharedData().HUMAN_HUMAN );
-		break;		
+		break;
 	}
 }
 
@@ -56,7 +56,7 @@ void BaseStrokeState::setupColors()
 
 void BaseStrokeState::exportPointData()
 {
-	for( auto it = data.pointData.begin(); it != data.pointData.end(); ++it ) 
+	for( std::vector< ofVec2f >::iterator it = data.pointData.begin(); it != data.pointData.end(); ++it )
 	{
 		ofVec2f recordedPoint = *it;
 		int row = csvExporter.numRows;
@@ -80,7 +80,7 @@ void BaseStrokeState::importPointData()
 	this->csvExporter.clear();
 	this->data.pointData.clear();
 	this->csvExporter.loadFile( ofToDataPath( createFileNameAccordingToCurrentExportAndImportIndex( currentPointsImportExportIndex, "POINTS" ) ) );
-	for( auto it = this->csvExporter.data.begin(); it != this->csvExporter.data.end(); ++it ) 
+	for( std::vector< std::vector< std::string > >::iterator it = this->csvExporter.data.begin(); it != this->csvExporter.data.end(); ++it )
 	{
 		std::vector< std::string > * pointS = &( * it );
 		std::string xS, yS;
@@ -116,10 +116,10 @@ std::string BaseStrokeState::createFileNameAccordingToCurrentExportAndImportInde
 void BaseStrokeState::exportMouseData()
 {
 	int inde = 0;
-	for( auto it = data.mouseData.begin(); it != data.mouseData.end(); ++it ) 
+	for( std::vector< std::vector< ofVec2f > >::iterator it = data.mouseData.begin(); it != data.mouseData.end(); ++it )
 	{
 		std::vector< ofVec2f > points = *it;
-		for( auto itp = points.begin(); itp != points.end(); itp++ )
+		for( std::vector< ofVec2f >::iterator itp = points.begin(); itp != points.end(); itp++ )
 		{
 			ofVec2f recordedPoint = *itp;
 			int row = csvExporter.numRows;
@@ -147,7 +147,7 @@ void BaseStrokeState::importMouseData()
 	this->data.mouseData.clear();
 	this->csvExporter.loadFile( ofToDataPath( createFileNameAccordingToCurrentExportAndImportIndex( currentMouseImportExportIndex, "MOUSE" ) ) );
 	this->data.mouseData.resize( 200 );
-	for( auto it = this->csvExporter.data.begin(); it != this->csvExporter.data.end(); ++it ) 
+	for( std::vector< std::vector< std::string > >::iterator it = this->csvExporter.data.begin(); it != this->csvExporter.data.end(); ++it )
 	{
 		std::vector< std::string > * pointS = &( * it );
 		std::string mouseIndexS, xS, yS;

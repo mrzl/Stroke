@@ -6,7 +6,7 @@ void ComputerComputerState::stateEnter()
 	//running = false;
 	this->state = INIT;
 	animationSpeed = 10.0f;
-	
+
 
 	currentPercentageX = currentPercentageY = 0.0f;
 	currentPointIndex = 0;
@@ -58,7 +58,7 @@ void ComputerComputerState::setupGUI()
 	stateNames.push_back( getSharedData().HUMAN_HUMAN + " (4)" );
 
 	gui->addRadio( getSharedData().stateSelectionRadioButton, stateNames, OFX_UI_ORIENTATION_VERTICAL );
-	
+
 	gui->setGlobalButtonDimension( OFX_UI_GLOBAL_BUTTON_DIMENSION );
 	gui->autoSizeToFitWidgets();
 	ofAddListener( gui->newGUIEvent, this, &ComputerComputerState::guiEvent );
@@ -119,7 +119,7 @@ void ComputerComputerState::draw()
 		lerpedY = lerp( fromPoint.y, toPoint.y, percentageY );
 		ofLine( fromPoint, ofVec2f( lerpedX, lerpedY ) );
 
-		for( size_t i = 0; i < currentPointIndex && this->data.pointData.size() > 1; i++ ) 
+		for( size_t i = 0; i < currentPointIndex && this->data.pointData.size() > 1; i++ )
 		{
 			ofVec2f from = this->data.pointData.at( i );
 			ofVec2f to = this->data.pointData.at( i + 1 );
@@ -131,7 +131,7 @@ void ComputerComputerState::draw()
 			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 	}
-	else 
+	else
 	{
 		debugDraw();
 	}
@@ -139,7 +139,7 @@ void ComputerComputerState::draw()
 
 void ComputerComputerState::debugDraw()
 {
-	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
+	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ )
 	{
 		ofVec2f from = this->data.pointData.at( i );
 		ofVec2f to = this->data.pointData.at( i + 1 );
@@ -171,7 +171,7 @@ void ComputerComputerState::keyPressed( int key )
 void ComputerComputerState::setupIdea( int pointNum )
 {
 	this->data.pointData.clear();
-	for( int i = 0; i < pointNum; i++ ) 
+	for( int i = 0; i < pointNum; i++ )
 	{
 		float x = ofRandom( 0, ofGetWidth() );
 		float y = ofRandom( 0, ofGetHeight() );
@@ -241,7 +241,7 @@ void ComputerComputerState::importIdea( std::string filePath )
 	wng::ofxCsv * pointDataImporter = new wng::ofxCsv();
 	pointDataImporter->loadFile( ofToDataPath( "saved/" + filePath ) );
 	this->data.pointData.clear();
-	for( auto it = pointDataImporter->data.begin(); it != pointDataImporter->data.end(); ++it ) 
+	for( std::vector< std::vector< std::string > >::iterator it = pointDataImporter->data.begin(); it != pointDataImporter->data.end(); ++it )
 	{
 		std::vector<std::string> * pointS = &( * it );
 		std::string xS, yS;
@@ -266,7 +266,7 @@ void ComputerComputerState::exportIdea( std::string fileName )
 	wng::ofxCsv * pointDataExporter = new wng::ofxCsv();
 	this->data.pointData.clear();
 	//this->data.mouseData.clear();
-	for( auto it = this->data.pointData.begin(); it != this->data.pointData.end(); ++it ) 
+	for( std::vector< ofVec2f >::iterator it = this->data.pointData.begin(); it != this->data.pointData.end(); ++it )
 	{
 		ofVec2f recordedPoints = *it;
 		int row = pointDataExporter->numRows;

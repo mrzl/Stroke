@@ -1,7 +1,4 @@
 #include "ofApp.h"
-#include "DrawingState.h"
-#include "FollowBallState.h"
-#include "RecreateState.h"
 
 #include "ComputerComputerState.h"
 #include "ComputerHumanState.h"
@@ -46,7 +43,7 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	
+
 }
 
 //--------------------------------------------------------------
@@ -65,7 +62,7 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
-	
+
 }
 
 //--------------------------------------------------------------
@@ -94,6 +91,6 @@ void ofApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }

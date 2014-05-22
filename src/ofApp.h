@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include <vector>
+#include <map>
 #include "ofxStateMachine.h"
 #include "SharedData.h"
 
@@ -21,7 +22,7 @@ public:
 	void windowResized(int w, int h);
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
-		
+
 
 private:
 	itg::ofxStateMachine<SharedData> stateMachine;
