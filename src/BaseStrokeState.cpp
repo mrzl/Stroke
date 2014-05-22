@@ -19,8 +19,7 @@ void BaseStrokeState::keyPressed( int key )
 	case 'w':
 		this->importPointData();
 		this->importMouseData();
-		this->state = RUNNING;
-		this->state = RECORDING;
+		this->state = DONE;
 		break;
 	case '1':
 		changeState( getSharedData().COMPUTER_COMPUTER );
@@ -56,7 +55,8 @@ void BaseStrokeState::setupColors()
 
 void BaseStrokeState::exportPointData()
 {
-	for( std::vector< ofVec2f >::iterator it = data.pointData.begin(); it != data.pointData.end(); ++it )
+	wng::ofxCsv csvExporter;
+	for( std::vector< ofVec2f >::iterator it = currentData.pointData.begin(); it != currentData.pointData.end(); ++it )
 	{
 		ofVec2f recordedPoint = *it;
 		int row = csvExporter.numRows;
@@ -67,20 +67,55 @@ void BaseStrokeState::exportPointData()
 	std::string fileName = createFileNameAccordingToCurrentExportAndImportIndex( currentPointsImportExportIndex, "POINTS" );
 	csvExporter.saveFile( ofToDataPath( fileName ) );
 	currentPointsImportExportIndex++;
-	if( currentPointsImportExportIndex >= 17 )
+	if( currentPointsImportExportIndex >= filesToLoad )
 	{
 		currentPointsImportExportIndex = 666;
 	}
-	this->data.pointData.clear();
-	this->csvExporter.clear();
+	this->currentData.pointData.clear();
+	csvExporter.clear();
+}
+
+void BaseStrokeState::exportMouseData()
+{
+	wng::ofxCsv csvExporter;
+	csvExporter.numRows = 0;
+	int inde = 0;
+	std::cout << "started this export" << std::endl;
+	//csvExporter.data.
+	for( std::vector< std::vector< ofVec2f > >::iterator it = this->currentData.currMouseData.begin(); it != this->currentData.currMouseData.end(); ++it )
+	{
+		std::vector< ofVec2f > points = *it;
+		for( std::vector< ofVec2f >::iterator itp = points.begin(); itp != points.end(); itp++ )
+		{
+			ofVec2f recordedPoint = *itp;
+			int row = csvExporter.numRows;
+			std::cout << "point to save --------------" << recordedPoint << std::endl;
+			csvExporter.setFloat(row, 0, inde );
+			csvExporter.setFloat(row, 1, recordedPoint.x );
+			csvExporter.setFloat(row, 2, recordedPoint.y );
+		}
+		inde++;
+	}
+	inde = 0;
+	//std::string fileName = getTimestampForToday( "points_recording" );
+	std::string fileName = createFileNameAccordingToCurrentExportAndImportIndex( currentMouseImportExportIndex, "MOUSE" );
+	csvExporter.saveFile( ofToDataPath( fileName ) );
+	currentMouseImportExportIndex++;
+	if( currentMouseImportExportIndex >= filesToLoad )
+	{
+		currentMouseImportExportIndex = 666;
+	}
+	this->currentData.currMouseData.clear();
+	csvExporter.clear();
 }
 
 void BaseStrokeState::importPointData()
 {
-	this->csvExporter.clear();
-	this->data.pointData.clear();
-	this->csvExporter.loadFile( ofToDataPath( createFileNameAccordingToCurrentExportAndImportIndex( currentPointsImportExportIndex, "POINTS" ) ) );
-	for( std::vector< std::vector< std::string > >::iterator it = this->csvExporter.data.begin(); it != this->csvExporter.data.end(); ++it )
+	wng::ofxCsv csvExporter;
+	csvExporter.clear();
+	this->currentData.pointData.clear();
+	csvExporter.loadFile( ofToDataPath( createFileNameAccordingToCurrentExportAndImportIndex( currentPointsImportExportIndex, "POINTS" ) ) );
+	for( std::vector< std::vector< std::string > >::iterator it = csvExporter.data.begin(); it != csvExporter.data.end(); ++it )
 	{
 		std::vector< std::string > * pointS = &( * it );
 		std::string xS, yS;
@@ -93,10 +128,10 @@ void BaseStrokeState::importPointData()
 		y = atoi( yS.c_str() );
 
 		ofVec2f point( x, y );
-		this->data.pointData.push_back( point );
+		this->currentData.pointData.push_back( point );
 	}
 	this->currentPointsImportExportIndex++;
-	if( this->currentPointsImportExportIndex >= 17 )
+	if( this->currentPointsImportExportIndex >= filesToLoad )
 	{
 		this->currentPointsImportExportIndex = 0;
 	}
@@ -113,41 +148,15 @@ std::string BaseStrokeState::createFileNameAccordingToCurrentExportAndImportInde
 	return ss.str();
 }
 
-void BaseStrokeState::exportMouseData()
-{
-	int inde = 0;
-	for( std::vector< std::vector< ofVec2f > >::iterator it = data.mouseData.begin(); it != data.mouseData.end(); ++it )
-	{
-		std::vector< ofVec2f > points = *it;
-		for( std::vector< ofVec2f >::iterator itp = points.begin(); itp != points.end(); itp++ )
-		{
-			ofVec2f recordedPoint = *itp;
-			int row = csvExporter.numRows;
-			csvExporter.setFloat(row, 0, inde );
-			csvExporter.setFloat(row, 1, recordedPoint.x );
-			csvExporter.setFloat(row, 2, recordedPoint.y );
-		}
-		inde++;
-	}
-	//std::string fileName = getTimestampForToday( "points_recording" );
-	std::string fileName = createFileNameAccordingToCurrentExportAndImportIndex( currentMouseImportExportIndex, "MOUSE" );
-	csvExporter.saveFile( ofToDataPath( fileName ) );
-	currentMouseImportExportIndex++;
-	if( currentMouseImportExportIndex >= 17 )
-	{
-		currentMouseImportExportIndex = 666;
-	}
-	this->data.mouseData.clear();
-	this->csvExporter.clear();
-}
-
 void BaseStrokeState::importMouseData()
 {
-	this->csvExporter.clear();
-	this->data.mouseData.clear();
-	this->csvExporter.loadFile( ofToDataPath( createFileNameAccordingToCurrentExportAndImportIndex( currentMouseImportExportIndex, "MOUSE" ) ) );
-	this->data.mouseData.resize( 200 );
-	for( std::vector< std::vector< std::string > >::iterator it = this->csvExporter.data.begin(); it != this->csvExporter.data.end(); ++it )
+	wng::ofxCsv csvExporter;
+	csvExporter.numRows = 0;
+	csvExporter.clear();
+	this->currentData.currMouseData.clear();
+	csvExporter.loadFile( ofToDataPath( createFileNameAccordingToCurrentExportAndImportIndex( currentMouseImportExportIndex, "MOUSE" ) ) );
+	this->currentData.currMouseData.resize( 200 );
+	for( std::vector< std::vector< std::string > >::iterator it = csvExporter.data.begin(); it != csvExporter.data.end(); ++it )
 	{
 		std::vector< std::string > * pointS = &( * it );
 		std::string mouseIndexS, xS, yS;
@@ -158,15 +167,17 @@ void BaseStrokeState::importMouseData()
 		yS = pointS->at( 2 );
 
 		mouseIndex = atoi( mouseIndexS.c_str() );
+		//mouseIndex += 1;
 		x = atoi( xS.c_str() );
 		y = atoi( yS.c_str() );
 
 		ofVec2f point( x, y );
-		this->data.mouseData.at( mouseIndex ).push_back( point );
+		this->currentData.currMouseData.at( mouseIndex ).push_back( point );
 	}
 	this->currentMouseImportExportIndex++;
-	if( this->currentMouseImportExportIndex >= 17 )
+	if( this->currentMouseImportExportIndex >= filesToLoad )
 	{
 		this->currentMouseImportExportIndex = 0;
 	}
+	this->currentData.currMouseData.shrink_to_fit();
 }

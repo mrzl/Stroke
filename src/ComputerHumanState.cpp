@@ -19,7 +19,7 @@ void ComputerHumanState::stateEnter()
 	setupGUI();
 	gui->setVisible( true );
 
-	this->data.mouseData.resize( *getPointCount() );
+	this->currentData.currMouseData.resize( *getPointCount() );
 }
 
 void ComputerHumanState::stateExit()
@@ -39,15 +39,15 @@ void ComputerHumanState::draw()
 	{
 		ofSetColor( 0, 255, 0 );
 		glLineWidth( getSharedData().strokeWeight );
-		ofCircle( this->data.pointData.at( currentPointIndex ).x, this->data.pointData.at( currentPointIndex ).y, 10, 10 );
+		ofCircle( this->currentData.pointData.at( currentPointIndex ).x, this->currentData.pointData.at( currentPointIndex ).y, 10, 10 );
 	}	
 	
 	if( this->state == DONE )
 	{
 		for( size_t i = 0; i < currentDrawingIndex; i++ ) 
 		{
-			ofVec2f from = this->data.pointData.at( i );
-			ofVec2f to = this->data.pointData.at( i + 1 );
+			ofVec2f from = this->currentData.pointData.at( i );
+			ofVec2f to = this->currentData.pointData.at( i + 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -56,19 +56,21 @@ void ComputerHumanState::draw()
 			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 		
-		ofVec2f from = this->data.pointData.at( currentDrawingIndex );
-		if( currentMouseDataIndex > this->data.mouseData.at(currentDrawingIndex).size() - 1 )
+		ofVec2f from = this->currentData.pointData.at( currentDrawingIndex );
+		if( currentMouseDataIndex > this->currentData.currMouseData.at(currentDrawingIndex).size() - 1 )
 		{
 			currentDrawingIndex++;
-			if( currentDrawingIndex + 1 >= this->data.pointData.size() )
+			if( currentDrawingIndex + 1 >= this->currentData.pointData.size() )
 			{
 				currentDrawingIndex = 0;
+				importPointData();
+				importMouseData();
 			}
 			currentMouseDataIndex = 0;
 		}
 		if( currentMouseDataIndex > 0)
 		{
-			ofVec2f to = this->data.mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
+			ofVec2f to = this->currentData.currMouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -94,10 +96,10 @@ void ComputerHumanState::draw()
 		ofSetColor( getSharedData().lineColor );
 		glLineWidth( getSharedData().strokeWeight );
 
-		for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
+		for( size_t i = 0; i < this->currentData.pointData.size() - 1 && this->currentData.pointData.size() > 1; i++ ) 
 		{
-			ofVec2f from = this->data.pointData.at( i );
-			ofVec2f to = this->data.pointData.at( i + 1 );
+			ofVec2f from = this->currentData.pointData.at( i );
+			ofVec2f to = this->currentData.pointData.at( i + 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -116,13 +118,13 @@ void ComputerHumanState::mouseMoved( int x, int y )
 		if( currentPointIndex > 0 )
 		{
 			//this->data.mouseData.push_back( v );
-			this->data.mouseData[currentPointIndex - 1].push_back( v );
+			this->currentData.currMouseData[currentPointIndex - 1].push_back( v );
 		}
 
-		float dist = v.distance( this->data.pointData.at( currentPointIndex ) );
+		float dist = v.distance( this->currentData.pointData.at( currentPointIndex ) );
 		if( dist < 10 ) 
 		{
-			if( currentPointIndex == this->data.pointData.size() - 1 )
+			if( currentPointIndex == this->currentData.pointData.size() - 1 )
 			{
 				this->state = DONE;
 			}
@@ -152,19 +154,19 @@ std::string ComputerHumanState::getName()
 void ComputerHumanState::setupIdea( int numPoints )
 {
 	this->state = RUNNING;
-	this->data.pointData.clear();
-	this->data.mouseData.clear();
+	this->currentData.pointData.clear();
+	this->currentData.currMouseData.clear();
 	currentMouseDataIndex = 0;
 	currentPointIndex = 0;
 	currentDrawingIndex = 0;
-	this->data.mouseData.resize( numPoints );
+	this->currentData.currMouseData.resize( numPoints );
 
 	for( int i = 0; i < *getPointCount(); i++ ) 
 	{
 		float x = ofRandom( 0, ofGetWidth() );
 		float y = ofRandom( 0, ofGetHeight() );
 
-		this->data.pointData.push_back( ofVec2f( x, y ) );
+		this->currentData.pointData.push_back( ofVec2f( x, y ) );
 	}
 }
 

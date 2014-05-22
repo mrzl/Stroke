@@ -28,7 +28,7 @@ private:
 	std::string setupIdeaButtonLabel, setupImplementationButtonLabel, startAnimationButtonLabel, allowParallelsButtonLabel;
 	float animationSpeed;
 	int currentPointIndex;
-	int currentDrawingIndex, currentMouseDataIndex;
+	float currentDrawingIndex, currentMouseDataIndex;
 
 	ofVec2f currentMouse;
 	ofVec2f getCurrentMouse();

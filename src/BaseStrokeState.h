@@ -17,9 +17,9 @@
 class BaseStrokeState : public itg::ofxState<SharedData>
 {
 public:
-    struct data {
+    struct currentData {
         std::vector< ofVec2f > pointData;
-        std::vector< std::vector< ofVec2f > > mouseData;
+        std::vector< std::vector< ofVec2f > > currMouseData;
     };
 	void keyPressed( int key );
 
@@ -37,7 +37,7 @@ public:
 
 protected:
 	// data
-	BaseStrokeState::data data;
+	currentData currentData;
 
 	// gui
 	ofxUISuperCanvas * gui;
@@ -53,7 +53,7 @@ protected:
 	float lerp( float start, float stop, float amt );
 
 	// export/import
-	wng::ofxCsv csvExporter;
+	static const int filesToLoad = 3;
 	int currentMouseImportExportIndex, currentPointsImportExportIndex;
 	std::string createFileNameAccordingToCurrentExportAndImportIndex( int index, std::string identifyingString );
 

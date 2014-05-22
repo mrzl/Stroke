@@ -73,10 +73,10 @@ void ComputerComputerState::stateExit()
 
 void ComputerComputerState::update()
 {
-	if( this->state == RUNNING && this->data.pointData.size() >= currentPointIndex + 1 )
+	if( this->state == RUNNING && this->currentData.pointData.size() >= currentPointIndex + 1 )
 	{
-		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
-		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
+		ofVec2f fromPoint = this->currentData.pointData.at( currentPointIndex );
+		ofVec2f toPoint = this->currentData.pointData.at( currentPointIndex + 1 );
 		float distance = fromPoint.distance( toPoint );
 		int toAdd = ofMap( distance, 0, 3000, animationSpeed, 1 );
 
@@ -89,7 +89,7 @@ void ComputerComputerState::update()
 				currentPercentageX = 0;
 				currentPercentageY = 0;
 				currentPointIndex++;
-				if( currentPointIndex == this->data.pointData.size() - 1 )
+				if( currentPointIndex == this->currentData.pointData.size() - 1 )
 				{
 					currentPointIndex = 0;
 				}
@@ -108,10 +108,10 @@ void ComputerComputerState::draw()
 {
 	BaseStrokeState::setupColors();
 
-	if( this->state == RUNNING && this->data.pointData.size() >= currentPointIndex + 1)
+	if( this->state == RUNNING && this->currentData.pointData.size() >= currentPointIndex + 1)
 	{
-		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
-		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
+		ofVec2f fromPoint = this->currentData.pointData.at( currentPointIndex );
+		ofVec2f toPoint = this->currentData.pointData.at( currentPointIndex + 1 );
 		float percentageX = currentPercentageX / 100.0;
 		float percentageY = currentPercentageY / 100.0;
 		float lerpedX, lerpedY;
@@ -119,10 +119,10 @@ void ComputerComputerState::draw()
 		lerpedY = lerp( fromPoint.y, toPoint.y, percentageY );
 		ofLine( fromPoint, ofVec2f( lerpedX, lerpedY ) );
 
-		for( size_t i = 0; i < currentPointIndex && this->data.pointData.size() > 1; i++ )
+		for( size_t i = 0; i < currentPointIndex && this->currentData.pointData.size() > 1; i++ )
 		{
-			ofVec2f from = this->data.pointData.at( i );
-			ofVec2f to = this->data.pointData.at( i + 1 );
+			ofVec2f from = this->currentData.pointData.at( i );
+			ofVec2f to = this->currentData.pointData.at( i + 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -139,10 +139,10 @@ void ComputerComputerState::draw()
 
 void ComputerComputerState::debugDraw()
 {
-	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ )
+	for( size_t i = 0; i < this->currentData.pointData.size() - 1 && this->currentData.pointData.size() > 1; i++ )
 	{
-		ofVec2f from = this->data.pointData.at( i );
-		ofVec2f to = this->data.pointData.at( i + 1 );
+		ofVec2f from = this->currentData.pointData.at( i );
+		ofVec2f to = this->currentData.pointData.at( i + 1 );
 		from.limited( from.length() - 2 );
 		from += (to - from).getNormalized() * 2 / 2;
 		to += (from - to).getNormalized() * 2;
@@ -170,13 +170,13 @@ void ComputerComputerState::keyPressed( int key )
 
 void ComputerComputerState::setupIdea( int pointNum )
 {
-	this->data.pointData.clear();
+	this->currentData.pointData.clear();
 	for( int i = 0; i < pointNum; i++ )
 	{
 		float x = ofRandom( 0, ofGetWidth() );
 		float y = ofRandom( 0, ofGetHeight() );
 
-		this->data.pointData.push_back( ofVec2f( x, y ) );
+		this->currentData.pointData.push_back( ofVec2f( x, y ) );
 	}
 }
 
@@ -240,7 +240,7 @@ void ComputerComputerState::importIdea( std::string filePath )
 {
 	wng::ofxCsv * pointDataImporter = new wng::ofxCsv();
 	pointDataImporter->loadFile( ofToDataPath( "saved/" + filePath ) );
-	this->data.pointData.clear();
+	this->currentData.pointData.clear();
 	for( std::vector< std::vector< std::string > >::iterator it = pointDataImporter->data.begin(); it != pointDataImporter->data.end(); ++it )
 	{
 		std::vector<std::string> * pointS = &( * it );
@@ -254,19 +254,19 @@ void ComputerComputerState::importIdea( std::string filePath )
 		y = atoi( yS.c_str() );
 
 		ofVec2f point( x, y );
-		this->data.pointData.push_back( point );
+		this->currentData.pointData.push_back( point );
 	}
 
-	*this->getPointCount() = this->data.pointData.size();
+	*this->getPointCount() = this->currentData.pointData.size();
 	delete pointDataImporter;
 }
 
 void ComputerComputerState::exportIdea( std::string fileName )
 {
 	wng::ofxCsv * pointDataExporter = new wng::ofxCsv();
-	this->data.pointData.clear();
+	this->currentData.pointData.clear();
 	//this->data.mouseData.clear();
-	for( std::vector< ofVec2f >::iterator it = this->data.pointData.begin(); it != this->data.pointData.end(); ++it )
+	for( std::vector< ofVec2f >::iterator it = this->currentData.pointData.begin(); it != this->currentData.pointData.end(); ++it )
 	{
 		ofVec2f recordedPoints = *it;
 		int row = pointDataExporter->numRows;

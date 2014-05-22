@@ -7,6 +7,7 @@ void HumanHumanState::stateEnter()
 	this->state = INIT;
 	this->allowParallels = true;
 	animationSpeed = 0.0f;
+	*this->getPointCount() = 200;
 	currentPointIndex = 0;
 	currentDrawingIndex = 0;
 	currentMouseDataIndex = 0;
@@ -64,7 +65,7 @@ void HumanHumanState::setupGUI()
 	gui->addLabelButton( this->allowParallelsButtonLabel, false );
 	gui->addSpacer();
 
-	gui->addSlider( "ANIMATIONSPEED", 1, 50, &animationSpeed );
+	gui->addSlider( "ANIMATIONSPEED", 0.2f, 50, &animationSpeed );
 	gui->addSpacer();
 
 	std::vector<std::string> stateNames;
@@ -89,7 +90,7 @@ void HumanHumanState::guiEvent(ofxUIEventArgs &e)
 	{
 		if( name == this->setupIdeaButtonLabel )
 		{
-			this->data.pointData.clear();
+			this->currentData.pointData.clear();
 			setupIdea( *this->getPointCount() );
 		}
 
@@ -127,7 +128,7 @@ void HumanHumanState::mouseMoved(int x, int y)
 		if( currentPointIndex > 0 )
 		{
 			//this->data.mouseData.push_back( v );
-			this->data.mouseData[currentPointIndex - 1].push_back( v );
+			this->currentData.currMouseData[currentPointIndex - 1].push_back( v );
 		}
 	}
 }
@@ -140,8 +141,8 @@ void HumanHumanState::mouseReleased(int x, int y, int button)
 {
 	if( this->state == RECORDING )
 	{
-		this->data.mouseData.resize( currentPointIndex + 1 );
-		this->data.pointData.push_back( ofVec2f( x, y ) );
+		this->currentData.currMouseData.resize( currentPointIndex + 1 );
+		this->currentData.pointData.push_back( ofVec2f( x, y ) );
 		currentPointIndex++;
 	}
 }
@@ -176,9 +177,9 @@ void HumanHumanState::draw()
 	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();
-		if( this->data.pointData.size() > 0 )
+		if( this->currentData.pointData.size() > 0 )
 		{
-			ofVec2f from = this->data.pointData.at( this->data.pointData.size() - 1 );
+			ofVec2f from = this->currentData.pointData.at( this->currentData.pointData.size() - 1 );
 			ofVec2f to = this->getCurrentMouse();
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
@@ -199,8 +200,8 @@ void HumanHumanState::draw()
 
 		for( size_t i = 0; i < currentDrawingIndex; i++ ) 
 		{
-			ofVec2f from = this->data.pointData.at( i );
-			ofVec2f to = this->data.pointData.at( i + 1 );
+			ofVec2f from = this->currentData.pointData.at( i );
+			ofVec2f to = this->currentData.pointData.at( i + 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -210,19 +211,12 @@ void HumanHumanState::draw()
 		}
 
 		
-		if( currentMouseDataIndex > this->data.mouseData.at(currentDrawingIndex).size() - 1 )
-		{
-			currentDrawingIndex++;
-			if( currentDrawingIndex + 1 >= this->data.pointData.size() )
-			{
-				currentDrawingIndex = 0;
-			}
-			currentMouseDataIndex = 0;
-		}
+		
 		if( currentMouseDataIndex > 0)
 		{
-			ofVec2f from = this->data.pointData.at( currentDrawingIndex );
-			ofVec2f to = this->data.mouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
+			ofVec2f from = this->currentData.pointData.at( currentDrawingIndex );
+			std::cout << this->currentData.currMouseData.size() << " " << this->currentData.currMouseData.at(currentDrawingIndex).size() << " " << this->currentData.pointData.size() << std::endl;
+			ofVec2f to = this->currentData.currMouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -230,15 +224,29 @@ void HumanHumanState::draw()
 			ofEllipse( from, getSharedData().strokeWeight, getSharedData().strokeWeight );
 			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
+
+		if( currentMouseDataIndex > this->currentData.currMouseData.at(currentDrawingIndex).size() - 1 )
+		{
+			currentDrawingIndex++;
+			if( currentDrawingIndex + 1 >= this->currentData.pointData.size() )
+			{
+				currentDrawingIndex = 0;
+				//currentMouseImportExportIndex++;
+				//currentPointsImportExportIndex++;
+				importPointData();
+				importMouseData();
+			}
+			currentMouseDataIndex = 0;
+		}
 	}
 }
 
 void HumanHumanState::debugDraw()
 {
-	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
+	for( size_t i = 0; i < this->currentData.pointData.size() - 1 && this->currentData.pointData.size() > 1; i++ ) 
 	{
-		ofVec2f from = this->data.pointData.at( i );
-		ofVec2f to = this->data.pointData.at( i + 1 );
+		ofVec2f from = this->currentData.pointData.at( i );
+		ofVec2f to = this->currentData.pointData.at( i + 1 );
 		from.limited( from.length() - 2 );
 		from += (to - from).getNormalized() * 2 / 2;
 		to += (from - to).getNormalized() * 2;

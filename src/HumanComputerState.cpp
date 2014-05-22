@@ -7,7 +7,7 @@ void HumanComputerState::stateEnter()
 	//this->recording = false;
 	this->state = INIT;
 	this->allowParallels = true;
-	animationSpeed = 0.0f;
+	animationSpeed = 1.0f;
 	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
 	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
 
@@ -25,10 +25,10 @@ void HumanComputerState::stateExit()
 
 void HumanComputerState::update()
 {
-	if( this->state == RUNNING && this->data.pointData.size() > currentPointIndex + 1 )
+	if( (this->state == RUNNING || this->state == DONE ) && this->currentData.pointData.size() > currentPointIndex + 1 )
 	{
-		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
-		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
+		ofVec2f fromPoint = this->currentData.pointData.at( currentPointIndex );
+		ofVec2f toPoint = this->currentData.pointData.at( currentPointIndex + 1 );
 		float distance = fromPoint.distance( toPoint );
 		int toAdd = ofMap( distance, 0, 3000, animationSpeed, 1 );
 
@@ -41,9 +41,10 @@ void HumanComputerState::update()
 				currentPercentageX = 0;
 				currentPercentageY = 0;
 				currentPointIndex++;
-				if( currentPointIndex == this->data.pointData.size() - 1 )
+				if( currentPointIndex == this->currentData.pointData.size() - 1 )
 				{
 					currentPointIndex = 0;
+					importPointData();
 				}
 			} else
 			{
@@ -59,10 +60,10 @@ void HumanComputerState::update()
 void HumanComputerState::draw()
 {
 	BaseStrokeState::setupColors();
-	if( this->state == RUNNING && this->data.pointData.size() > currentPointIndex + 1)
+	if( (this->state == RUNNING || this->state == DONE ) && this->currentData.pointData.size() > currentPointIndex + 1)
 	{
-		ofVec2f fromPoint = this->data.pointData.at( currentPointIndex );
-		ofVec2f toPoint = this->data.pointData.at( currentPointIndex + 1 );
+		ofVec2f fromPoint = this->currentData.pointData.at( currentPointIndex );
+		ofVec2f toPoint = this->currentData.pointData.at( currentPointIndex + 1 );
 		float percentageX = currentPercentageX / 100.0;
 		float percentageY = currentPercentageY / 100.0;
 		float lerpedX, lerpedY;
@@ -77,10 +78,10 @@ void HumanComputerState::draw()
 		ofEllipse( fromPoint, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		ofEllipse( toLerped, getSharedData().strokeWeight, getSharedData().strokeWeight );
 
-		for( size_t i = 0; i < currentPointIndex && this->data.pointData.size() > 1; i++ ) 
+		for( size_t i = 0; i < currentPointIndex && this->currentData.pointData.size() > 1; i++ ) 
 		{
-			ofVec2f from = this->data.pointData.at( i );
-			ofVec2f to = this->data.pointData.at( i + 1 );
+			ofVec2f from = this->currentData.pointData.at( i );
+			ofVec2f to = this->currentData.pointData.at( i + 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
 			to += (from - to).getNormalized() * 2;
@@ -93,9 +94,9 @@ void HumanComputerState::draw()
 	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();
-		if( this->data.pointData.size() > 0 )
+		if( this->currentData.pointData.size() > 0 )
 		{
-			ofVec2f from = this->data.pointData.at( this->data.pointData.size() - 1 );
+			ofVec2f from = this->currentData.pointData.at( this->currentData.pointData.size() - 1 );
 			ofVec2f to = this->getCurrentMouse();
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
@@ -114,10 +115,10 @@ void HumanComputerState::draw()
 
 void HumanComputerState::debugDraw()
 {
-	for( size_t i = 0; i < this->data.pointData.size() - 1 && this->data.pointData.size() > 1; i++ ) 
+	for( size_t i = 0; i < this->currentData.pointData.size() - 1 && this->currentData.pointData.size() > 1; i++ ) 
 	{
-		ofVec2f from = this->data.pointData.at( i );
-		ofVec2f to = this->data.pointData.at( i + 1 );
+		ofVec2f from = this->currentData.pointData.at( i );
+		ofVec2f to = this->currentData.pointData.at( i + 1 );
 		from.limited( from.length() - 2 );
 		from += (to - from).getNormalized() * 2 / 2;
 		to += (from - to).getNormalized() * 2;
@@ -190,7 +191,7 @@ void HumanComputerState::guiEvent( ofxUIEventArgs &e )
 	{
 		if( name == this->setupIdeaButtonLabel )
 		{
-			this->data.pointData.clear();
+			this->currentData.pointData.clear();
 			setupIdea( *this->getPointCount() );
 		}
 		
@@ -229,10 +230,10 @@ void HumanComputerState::mouseReleased( int x, int y, int button )
 {
 	if( this->state == RECORDING )
 	{
-		this->data.pointData.push_back( ofVec2f( x, y ) );
+		this->currentData.pointData.push_back( ofVec2f( x, y ) );
 	}
 	
-	if( this->data.pointData.size() > *this->getPointCount() )
+	if( this->currentData.pointData.size() > *this->getPointCount() )
 	{
 		//recording = false;
 	}
