@@ -2,9 +2,6 @@
 
 #include "BaseStrokeState.h"
 
-#include "ofxUI.h"
-#include "ofxCsv.h"
-
 class ComputerComputerState : public BaseStrokeState
 {
 public:

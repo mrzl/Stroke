@@ -14,6 +14,15 @@ void ComputerComputerState::stateEnter()
 	setupGUI();
 
 	gui->setVisible( true );
+
+	fbo.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
+
+	warper.setSourceRect( ofRectangle( 0, 0, ofGetWindowWidth(), ofGetWindowHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
+	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
+	warper.setTopRightCornerPosition( ofPoint( ofGetWindowWidth(), 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
+	warper.setup();
 }
 
 void ComputerComputerState::setupGUI()
@@ -107,6 +116,7 @@ void ComputerComputerState::update()
 void ComputerComputerState::draw()
 {
 	BaseStrokeState::setupColors();
+	BaseStrokeState::beforeDrawing();
 
 	if( this->state == RUNNING && this->currentData.pointData.size() >= currentPointIndex + 1)
 	{
@@ -135,6 +145,8 @@ void ComputerComputerState::draw()
 	{
 		debugDraw();
 	}
+	
+	BaseStrokeState::afterDrawing();
 }
 
 void ComputerComputerState::debugDraw()

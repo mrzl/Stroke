@@ -174,6 +174,7 @@ void HumanHumanState::update()
 void HumanHumanState::draw()
 {
 	BaseStrokeState::setupColors();
+	BaseStrokeState::beforeDrawing();
 	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();
@@ -239,6 +240,8 @@ void HumanHumanState::draw()
 			currentMouseDataIndex = 0;
 		}
 	}
+
+	BaseStrokeState::afterDrawing();
 }
 
 void HumanHumanState::debugDraw()

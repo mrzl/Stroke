@@ -9,10 +9,9 @@
 #include "ofxState.h"
 #include "ofxUI.h"
 #include "ofxCsv.h"
+#include "ofxQuadWarp.h"
 
 #include "SharedData.h"
-
-
 
 class BaseStrokeState : public itg::ofxState<SharedData>
 {
@@ -27,6 +26,8 @@ public:
 	virtual void setupImplementation() = 0;
 	virtual std::string getName() = 0;
 	void setupPointCount( int pointCount );
+	void beforeDrawing();
+	void afterDrawing();
 	void setupColors();
 	void exportPointData();
 	void importPointData();
@@ -56,6 +57,10 @@ protected:
 	static const int filesToLoad = 3;
 	int currentMouseImportExportIndex, currentPointsImportExportIndex;
 	std::string createFileNameAccordingToCurrentExportAndImportIndex( int index, std::string identifyingString );
+
+	// mapping
+	ofxQuadWarp         warper;
+	ofFbo               fbo;
 
 private:
 	float pointNum;

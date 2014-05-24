@@ -21,6 +21,9 @@ void BaseStrokeState::keyPressed( int key )
 		this->importMouseData();
 		this->state = DONE;
 		break;
+	case 'q':
+		warper.toggleShow();
+		break;
 	case '1':
 		changeState( getSharedData().COMPUTER_COMPUTER );
 		break;
@@ -180,4 +183,25 @@ void BaseStrokeState::importMouseData()
 		this->currentMouseImportExportIndex = 0;
 	}
 	this->currentData.currMouseData.shrink_to_fit();
+}
+
+void BaseStrokeState::beforeDrawing()
+{
+	fbo.begin();
+}
+
+void BaseStrokeState::afterDrawing()
+{
+	fbo.end();
+
+	ofMatrix4x4 mat = warper.getMatrix();
+
+	glPushMatrix();
+	ofSetLineWidth( 1 );
+	glMultMatrixf( mat.getPtr() );
+	{
+		fbo.draw( 0, 0 );
+	}
+	glPopMatrix();
+	warper.draw();
 }

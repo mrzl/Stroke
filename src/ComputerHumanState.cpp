@@ -35,6 +35,7 @@ void ComputerHumanState::update()
 void ComputerHumanState::draw()
 {
 	BaseStrokeState::setupColors();
+	BaseStrokeState::beforeDrawing();
 	if( this->state == RECORDING )
 	{
 		ofSetColor( 0, 255, 0 );
@@ -108,6 +109,8 @@ void ComputerHumanState::draw()
 			ofEllipse( to, getSharedData().strokeWeight, getSharedData().strokeWeight );
 		}
 	}
+
+	BaseStrokeState::afterDrawing();
 }
 
 void ComputerHumanState::mouseMoved( int x, int y )
