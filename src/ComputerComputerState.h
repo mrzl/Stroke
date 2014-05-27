@@ -23,6 +23,8 @@ public:
 	// implementations are not im/ex-ported, they're always live.
 	void setupImplementation();
 
+	void end();
+
 private:
 	// gui
 	void setupGUI();
@@ -39,5 +41,13 @@ private:
 
 	// misc
 	std::vector< std::string > getAvailableSavedIdeas();
+
+	// mapping
+	ofxQuadWarp         warper;
+	ofFbo               fbo;
+	bool isCursorVisible;
+	void beforeDrawing();
+	void afterDrawing();
+	void setupColors();
 };
 

@@ -61,7 +61,7 @@ void BaseStrokeState::setupColors()
 	ofClear( getSharedData().backgroundColor.r, getSharedData().backgroundColor.g, getSharedData().backgroundColor.b, 255 );
 	ofBackground( getSharedData().backgroundColor );
 	ofSetColor( getSharedData().backgroundColor );
-	ofRect( 0, 0, 200, ofGetWindowHeight() );
+	//ofRect( 0, 0, 200, ofGetWindowHeight() );
 	ofSetColor( getSharedData().lineColor );
 	glLineWidth( getSharedData().strokeWeight );
 	fbo.begin();
@@ -87,12 +87,12 @@ void BaseStrokeState::afterDrawing()
 		fbo.draw( 0, 0 );
 	}
 	glPopMatrix();
+	ofSetLineWidth( getSharedData().strokeWeight );
 	warper.draw();
 	fbo.begin();
 	ofClear( getSharedData().backgroundColor.r, getSharedData().backgroundColor.g, getSharedData().backgroundColor.b );
 	fbo.end();
 }
-
 
 void BaseStrokeState::exportPointData()
 {
@@ -166,6 +166,9 @@ void BaseStrokeState::importPointData()
 		x = atoi( xS.c_str() );
 		y = atoi( yS.c_str() );
 
+		x = ofMap( x, 0, 1920, 0, 1280 );
+		y = ofMap( y, 0, 1080, 0, 800 );
+
 		ofVec2f point( x, y );
 		this->currentData.pointData.push_back( point );
 	}
@@ -209,6 +212,9 @@ void BaseStrokeState::importMouseData()
 		//mouseIndex += 1;
 		x = atoi( xS.c_str() );
 		y = atoi( yS.c_str() );
+
+		x = ofMap( x, 0, 1920, 0, 1280 );
+		y = ofMap( y, 0, 1080, 0, 800 );
 
 		ofVec2f point( x, y );
 		this->currentData.currMouseData.at( mouseIndex ).push_back( point );

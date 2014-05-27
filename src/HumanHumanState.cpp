@@ -13,7 +13,13 @@ void HumanHumanState::stateEnter()
 	currentMouseDataIndex = 0;
 	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
 	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
-	
+	fbo.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
+	warper.setSourceRect( ofRectangle( 0, 0, ofGetWindowWidth(), ofGetWindowHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
+	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
+	warper.setTopRightCornerPosition( ofPoint( ofGetWindowWidth(), 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
+	warper.setup();
 	//if( this->data.mouseData.empty() )
 	{
 		this->state = INIT;
@@ -173,9 +179,9 @@ void HumanHumanState::update()
 
 void HumanHumanState::draw()
 {
-	
 	BaseStrokeState::beforeDrawing();
 	BaseStrokeState::setupColors();
+
 	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();
@@ -263,4 +269,9 @@ void HumanHumanState::debugDraw()
 ofVec2f HumanHumanState::getCurrentMouse()
 {
 	return this->currentMouse;
+}
+
+void HumanHumanState::end()
+{
+
 }

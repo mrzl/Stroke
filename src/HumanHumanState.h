@@ -22,6 +22,7 @@ public:
 	void mousePressed( int x, int y, int key );
 	void mouseReleased( int x, int y, int button );
 	void keyPressed( int key );
+	void end();
 
 private:
 	bool allowParallels;

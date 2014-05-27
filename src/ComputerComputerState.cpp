@@ -3,6 +3,7 @@
 void ComputerComputerState::stateEnter()
 {
 	BaseStrokeState::setupPointCount( 100 );
+	*getPointCount() = 40;
 	//running = false;
 	this->state = INIT;
 	animationSpeed = 10.0f;
@@ -23,6 +24,9 @@ void ComputerComputerState::stateEnter()
 	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
+
+	setupIdea(*getPointCount() );
+	this->state = RUNNING;
 }
 
 void ComputerComputerState::setupGUI()
@@ -101,6 +105,7 @@ void ComputerComputerState::update()
 				if( currentPointIndex == this->currentData.pointData.size() - 1 )
 				{
 					currentPointIndex = 0;
+					end();
 				}
 			} else
 			{
@@ -116,8 +121,8 @@ void ComputerComputerState::update()
 void ComputerComputerState::draw()
 {
 	
-	BaseStrokeState::beforeDrawing();
-	BaseStrokeState::setupColors();
+	beforeDrawing();
+	setupColors();
 
 	if( this->state == RUNNING && this->currentData.pointData.size() >= currentPointIndex + 1)
 	{
@@ -147,7 +152,7 @@ void ComputerComputerState::draw()
 		debugDraw();
 	}
 	
-	BaseStrokeState::afterDrawing();
+	afterDrawing();
 }
 
 void ComputerComputerState::debugDraw()
@@ -179,6 +184,19 @@ void ComputerComputerState::mouseReleased( int x, int y, int button )
 void ComputerComputerState::keyPressed( int key )
 {
 	BaseStrokeState::keyPressed( key );
+	switch( key )
+	{
+	case 'q':
+		warper.toggleShow();
+		break;
+	case 'c':
+		isCursorVisible = !isCursorVisible;
+		if ( isCursorVisible == true) 
+			ofShowCursor(); 
+		else
+			ofHideCursor();
+		break;
+	}
 }
 
 void ComputerComputerState::setupIdea( int pointNum )
@@ -186,8 +204,8 @@ void ComputerComputerState::setupIdea( int pointNum )
 	this->currentData.pointData.clear();
 	for( int i = 0; i < pointNum; i++ )
 	{
-		float x = ofRandom( 0, ofGetWidth() );
-		float y = ofRandom( 0, ofGetHeight() );
+		float x = ofRandom( 0, ofGetWindowWidth() );
+		float y = ofRandom( 0, ofGetWindowHeight() );
 
 		this->currentData.pointData.push_back( ofVec2f( x, y ) );
 	}
@@ -308,4 +326,48 @@ std::vector< std::string > ComputerComputerState::getAvailableSavedIdeas()
 	}
 
 	return ideas;
+}
+
+void ComputerComputerState::setupColors()
+{
+	ofClear( getSharedData().backgroundColor.r, getSharedData().backgroundColor.g, getSharedData().backgroundColor.b, 255 );
+	ofBackground( getSharedData().backgroundColor );
+	ofSetColor( getSharedData().backgroundColor );
+	//ofRect( 0, 0, 200, ofGetWindowHeight() );
+	ofSetColor( getSharedData().lineColor );
+	glLineWidth( getSharedData().strokeWeight );
+	fbo.begin();
+
+}
+
+void ComputerComputerState::beforeDrawing()
+{
+	ofBackground( getSharedData().backgroundColor );
+
+}
+
+void ComputerComputerState::afterDrawing()
+{
+	fbo.end();
+
+	ofMatrix4x4 mat = warper.getMatrix();
+
+	glPushMatrix();
+	ofSetLineWidth( 1 );
+	glMultMatrixf( mat.getPtr() );
+	{
+		fbo.draw( 0, 0 );
+	}
+	glPopMatrix();
+	ofSetLineWidth( getSharedData().strokeWeight );
+	warper.draw();
+	fbo.begin();
+	ofClear( getSharedData().backgroundColor.r, getSharedData().backgroundColor.g, getSharedData().backgroundColor.b );
+	fbo.end();
+}
+
+void ComputerComputerState::end()
+{
+	setupIdea( *getPointCount() );
+	changeState( getSharedData().COMPUTER_HUMAN );
 }

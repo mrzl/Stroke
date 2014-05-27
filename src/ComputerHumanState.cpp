@@ -1,6 +1,18 @@
 #include "ComputerHumanState.h"
 #include "ComputerComputerState.h"
 
+
+ComputerHumanState::ComputerHumanState()
+{
+	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
+}
+
+ComputerHumanState::~ComputerHumanState()
+{
+
+}
+
+
 void ComputerHumanState::stateEnter()
 {
 	BaseStrokeState::setupPointCount( 100 );
@@ -9,17 +21,27 @@ void ComputerHumanState::stateEnter()
 	currentMouseDataIndex = 0;
 	animationSpeed = 1;
 	this->state = INIT;
-	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
+	//this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
 	
 	//if( this->data.mouseData.empty() )
 	{
 		//recorded = false;
 	}
-
+	fbo.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
+	warper.setSourceRect( ofRectangle( 0, 0, ofGetWindowWidth(), ofGetWindowHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
+	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
+	warper.setTopRightCornerPosition( ofPoint( ofGetWindowWidth(), 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
+	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
+	warper.setup();
 	setupGUI();
 	gui->setVisible( true );
 
 	this->currentData.currMouseData.resize( *getPointCount() );
+
+	this->importPointData();
+	this->importMouseData();
+	this->state = DONE;
 }
 
 void ComputerHumanState::stateExit()
@@ -65,8 +87,7 @@ void ComputerHumanState::draw()
 			if( currentDrawingIndex + 1 >= this->currentData.pointData.size() )
 			{
 				currentDrawingIndex = 0;
-				importPointData();
-				importMouseData();
+				end();
 			}
 			currentMouseDataIndex = 0;
 		}
@@ -232,4 +253,11 @@ void ComputerHumanState::guiEvent( ofxUIEventArgs &e )
 			setupImplementation();
 		}
 	}
+}
+
+void ComputerHumanState::end()
+{
+	//importPointData();
+	//importMouseData();
+	changeState( getSharedData().COMPUTER_COMPUTER );
 }

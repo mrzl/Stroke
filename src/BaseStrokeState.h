@@ -25,6 +25,7 @@ public:
 	virtual void setupIdea( int pointNum ) = 0;
 	virtual void setupImplementation() = 0;
 	virtual std::string getName() = 0;
+	virtual void end() = 0;
 	void setupPointCount( int pointCount );
 	void beforeDrawing();
 	void afterDrawing();
