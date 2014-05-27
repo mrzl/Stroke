@@ -59,8 +59,8 @@ void HumanComputerState::update()
 
 void HumanComputerState::draw()
 {
-	BaseStrokeState::setupColors();
 	BaseStrokeState::beforeDrawing();
+	BaseStrokeState::setupColors();
 	if( (this->state == RUNNING || this->state == DONE ) && this->currentData.pointData.size() > currentPointIndex + 1)
 	{
 		ofVec2f fromPoint = this->currentData.pointData.at( currentPointIndex );

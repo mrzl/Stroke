@@ -34,8 +34,9 @@ void ComputerHumanState::update()
 
 void ComputerHumanState::draw()
 {
-	BaseStrokeState::setupColors();
+	
 	BaseStrokeState::beforeDrawing();
+	BaseStrokeState::setupColors();
 	if( this->state == RECORDING )
 	{
 		ofSetColor( 0, 255, 0 );

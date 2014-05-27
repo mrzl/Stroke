@@ -115,8 +115,9 @@ void ComputerComputerState::update()
 
 void ComputerComputerState::draw()
 {
-	BaseStrokeState::setupColors();
+	
 	BaseStrokeState::beforeDrawing();
+	BaseStrokeState::setupColors();
 
 	if( this->state == RUNNING && this->currentData.pointData.size() >= currentPointIndex + 1)
 	{

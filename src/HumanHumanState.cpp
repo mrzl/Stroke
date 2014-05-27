@@ -65,7 +65,7 @@ void HumanHumanState::setupGUI()
 	gui->addLabelButton( this->allowParallelsButtonLabel, false );
 	gui->addSpacer();
 
-	gui->addSlider( "ANIMATIONSPEED", 0.2f, 50, &animationSpeed );
+	gui->addSlider( "ANIMATIONSPEED", 0.7f, 50, &animationSpeed );
 	gui->addSpacer();
 
 	std::vector<std::string> stateNames;
@@ -173,8 +173,9 @@ void HumanHumanState::update()
 
 void HumanHumanState::draw()
 {
-	BaseStrokeState::setupColors();
+	
 	BaseStrokeState::beforeDrawing();
+	BaseStrokeState::setupColors();
 	if( allowParallels && this->state == RECORDING )
 	{
 		debugDraw();

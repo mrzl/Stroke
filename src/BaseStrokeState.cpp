@@ -24,6 +24,13 @@ void BaseStrokeState::keyPressed( int key )
 	case 'q':
 		warper.toggleShow();
 		break;
+	case 'c':
+		isCursorVisible = !isCursorVisible;
+		if ( isCursorVisible == true) 
+			ofShowCursor(); 
+		else
+			ofHideCursor();
+	break;
 	case '1':
 		changeState( getSharedData().COMPUTER_COMPUTER );
 		break;
@@ -51,10 +58,41 @@ void BaseStrokeState::setupPointCount(int pointCount)
 
 void BaseStrokeState::setupColors()
 {
+	ofClear( getSharedData().backgroundColor.r, getSharedData().backgroundColor.g, getSharedData().backgroundColor.b, 255 );
 	ofBackground( getSharedData().backgroundColor );
+	ofSetColor( getSharedData().backgroundColor );
+	ofRect( 0, 0, 200, ofGetWindowHeight() );
 	ofSetColor( getSharedData().lineColor );
 	glLineWidth( getSharedData().strokeWeight );
+	fbo.begin();
+	
 }
+
+void BaseStrokeState::beforeDrawing()
+{
+	ofBackground( getSharedData().backgroundColor );
+	
+}
+
+void BaseStrokeState::afterDrawing()
+{
+	fbo.end();
+
+	ofMatrix4x4 mat = warper.getMatrix();
+
+	glPushMatrix();
+	ofSetLineWidth( 1 );
+	glMultMatrixf( mat.getPtr() );
+	{
+		fbo.draw( 0, 0 );
+	}
+	glPopMatrix();
+	warper.draw();
+	fbo.begin();
+	ofClear( getSharedData().backgroundColor.r, getSharedData().backgroundColor.g, getSharedData().backgroundColor.b );
+	fbo.end();
+}
+
 
 void BaseStrokeState::exportPointData()
 {
@@ -83,8 +121,6 @@ void BaseStrokeState::exportMouseData()
 	wng::ofxCsv csvExporter;
 	csvExporter.numRows = 0;
 	int inde = 0;
-	std::cout << "started this export" << std::endl;
-	//csvExporter.data.
 	for( std::vector< std::vector< ofVec2f > >::iterator it = this->currentData.currMouseData.begin(); it != this->currentData.currMouseData.end(); ++it )
 	{
 		std::vector< ofVec2f > points = *it;
@@ -92,7 +128,6 @@ void BaseStrokeState::exportMouseData()
 		{
 			ofVec2f recordedPoint = *itp;
 			int row = csvExporter.numRows;
-			std::cout << "point to save --------------" << recordedPoint << std::endl;
 			csvExporter.setFloat(row, 0, inde );
 			csvExporter.setFloat(row, 1, recordedPoint.x );
 			csvExporter.setFloat(row, 2, recordedPoint.y );
@@ -110,6 +145,7 @@ void BaseStrokeState::exportMouseData()
 	}
 	this->currentData.currMouseData.clear();
 	csvExporter.clear();
+	this->state = STATE::INIT;
 }
 
 void BaseStrokeState::importPointData()
@@ -183,25 +219,4 @@ void BaseStrokeState::importMouseData()
 		this->currentMouseImportExportIndex = 0;
 	}
 	this->currentData.currMouseData.shrink_to_fit();
-}
-
-void BaseStrokeState::beforeDrawing()
-{
-	fbo.begin();
-}
-
-void BaseStrokeState::afterDrawing()
-{
-	fbo.end();
-
-	ofMatrix4x4 mat = warper.getMatrix();
-
-	glPushMatrix();
-	ofSetLineWidth( 1 );
-	glMultMatrixf( mat.getPtr() );
-	{
-		fbo.draw( 0, 0 );
-	}
-	glPopMatrix();
-	warper.draw();
 }

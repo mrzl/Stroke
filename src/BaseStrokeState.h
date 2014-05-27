@@ -54,13 +54,14 @@ protected:
 	float lerp( float start, float stop, float amt );
 
 	// export/import
-	static const int filesToLoad = 3;
+	static const int filesToLoad = 17;
 	int currentMouseImportExportIndex, currentPointsImportExportIndex;
 	std::string createFileNameAccordingToCurrentExportAndImportIndex( int index, std::string identifyingString );
 
 	// mapping
 	ofxQuadWarp         warper;
 	ofFbo               fbo;
+	bool isCursorVisible;
 
 private:
 	float pointNum;

@@ -22,8 +22,8 @@ void ofApp::setup(){
 
 	stateMachine.getSharedData().stateSelectionRadioButton = "STATE";
 
-	stateMachine.getSharedData().backgroundColor = ofColor( 255, 255, 255 );
-	stateMachine.getSharedData().lineColor = ofColor( 0, 0, 0 );
+	stateMachine.getSharedData().backgroundColor = ofColor( 255, 255, 255, 255 );
+	stateMachine.getSharedData().lineColor = ofColor( 0, 0, 0, 255 );
 	stateMachine.getSharedData().strokeWeight = 5;
 
 	stateMachine.addState<ComputerComputerState>();
