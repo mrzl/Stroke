@@ -5,6 +5,8 @@
 class HumanHumanState : public BaseStrokeState
 {
 public:
+	HumanHumanState();
+	~HumanHumanState();
 	void stateEnter();
 	void stateExit();
 

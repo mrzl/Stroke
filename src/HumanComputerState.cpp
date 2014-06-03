@@ -1,27 +1,42 @@
 #include "HumanComputerState.h"
 #include "SharedData.h"
 
-void HumanComputerState::stateEnter()
+HumanComputerState::HumanComputerState()
 {
-	BaseStrokeState::setupPointCount( 100 );
-	//this->recording = false;
-	this->state = INIT;
-	this->allowParallels = true;
-	animationSpeed = 1.0f;
-	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
 	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
-
-	currentPercentageX = currentPercentageY = 0.0f;
-	currentPointIndex = 0;
 	fbo.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
+
 	warper.setSourceRect( ofRectangle( 0, 0, ofGetWindowWidth(), ofGetWindowHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
 	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
 	warper.setTopRightCornerPosition( ofPoint( ofGetWindowWidth(), 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
+}
+
+HumanComputerState::~HumanComputerState()
+{
+
+}
+
+
+void HumanComputerState::stateEnter()
+{
+	BaseStrokeState::setupPointCount( 100 );
+	//this->recording = false;
+	this->state = INIT;
+	this->allowParallels = true;
+	animationSpeed = 10.0f;
+	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
+	
+	currentPercentageX = currentPercentageY = 0.0f;
+	currentPointIndex = 0;
+	
 	setupGUI();
-	gui->setVisible( true );
+	this->gui->setVisible( false );
+	//gui->setVisible( true );
+	importPointData();
+	state = DONE;
 }
 
 void HumanComputerState::stateExit()
@@ -50,7 +65,7 @@ void HumanComputerState::update()
 				if( currentPointIndex == this->currentData.pointData.size() - 1 )
 				{
 					currentPointIndex = 0;
-					importPointData();
+					end();
 				}
 			} else
 			{
@@ -269,5 +284,5 @@ ofVec2f HumanComputerState::getCurrentMouse()
 
 void HumanComputerState::end()
 {
-
+	changeState( getSharedData().HUMAN_HUMAN );
 }

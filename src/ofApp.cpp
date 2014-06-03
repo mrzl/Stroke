@@ -7,10 +7,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	std::cout << "2" << std::endl;
 	ofSetFrameRate(60);
 	ofEnableSmoothing();
 	ofEnableAlphaBlending();
 	ofSetVerticalSync(true);
+	std::cout << "3" << std::endl;
 
 	stateMachine.getSharedData().COMPUTER_COMPUTER = "COMPUTER_COMPUTER";
 	stateMachine.getSharedData().COMPUTER_HUMAN = "COMPUTER_HUMAN";

@@ -30,6 +30,17 @@ void BaseStrokeState::keyPressed( int key )
 			ofShowCursor(); 
 		else
 			ofHideCursor();
+	case 'a':
+		if ( ofRandomf() > 0.5f )
+		{
+			getSharedData().lineColor = ofColor( 0, 0, 0, 255 );
+			getSharedData().backgroundColor = ofColor( 255, 255, 255, 255 );
+		}
+		else
+		{
+			getSharedData().lineColor = ofColor( 255, 255, 255, 255 );
+			getSharedData().backgroundColor = ofColor( 0, 0, 0 , 255 );
+		}
 	break;
 	case '1':
 		changeState( getSharedData().COMPUTER_COMPUTER );
@@ -166,8 +177,8 @@ void BaseStrokeState::importPointData()
 		x = atoi( xS.c_str() );
 		y = atoi( yS.c_str() );
 
-		x = ofMap( x, 0, 1920, 0, 1280 );
-		y = ofMap( y, 0, 1080, 0, 800 );
+		x = ofMap( x, 0, 1920, 0, ofGetWindowWidth() );
+		y = ofMap( y, 0, 1080, 0, ofGetWindowHeight() );
 
 		ofVec2f point( x, y );
 		this->currentData.pointData.push_back( point );
@@ -213,8 +224,8 @@ void BaseStrokeState::importMouseData()
 		x = atoi( xS.c_str() );
 		y = atoi( yS.c_str() );
 
-		x = ofMap( x, 0, 1920, 0, 1280 );
-		y = ofMap( y, 0, 1080, 0, 800 );
+		x = ofMap( x, 0, 1920, 0, ofGetWindowWidth() );
+		y = ofMap( y, 0, 1080, 0, ofGetWindowHeight() );
 
 		ofVec2f point( x, y );
 		this->currentData.currMouseData.at( mouseIndex ).push_back( point );
@@ -225,4 +236,9 @@ void BaseStrokeState::importMouseData()
 		this->currentMouseImportExportIndex = 0;
 	}
 	this->currentData.currMouseData.shrink_to_fit();
+}
+
+void BaseStrokeState::initWarping()
+{
+	
 }

@@ -5,6 +5,8 @@
 class ComputerComputerState : public BaseStrokeState
 {
 public:
+	ComputerComputerState();
+	~ComputerComputerState();
 	void stateEnter();
 	void stateExit();
 	void update();

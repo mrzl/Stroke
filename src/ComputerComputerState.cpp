@@ -1,21 +1,8 @@
 #include "ComputerComputerState.h"
 
-void ComputerComputerState::stateEnter()
+
+ComputerComputerState::ComputerComputerState()
 {
-	BaseStrokeState::setupPointCount( 100 );
-	*getPointCount() = 40;
-	//running = false;
-	this->state = INIT;
-	animationSpeed = 10.0f;
-
-
-	currentPercentageX = currentPercentageY = 0.0f;
-	currentPointIndex = 0;
-
-	setupGUI();
-
-	gui->setVisible( true );
-
 	fbo.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
 
 	warper.setSourceRect( ofRectangle( 0, 0, ofGetWindowWidth(), ofGetWindowHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
@@ -24,6 +11,28 @@ void ComputerComputerState::stateEnter()
 	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
+}
+
+ComputerComputerState::~ComputerComputerState()
+{
+
+}
+
+void ComputerComputerState::stateEnter()
+{
+	BaseStrokeState::setupPointCount( 100 );
+	*getPointCount() = 40;
+	//running = false;
+	this->state = INIT;
+	animationSpeed = 5.0f;
+	
+	currentPercentageX = currentPercentageY = 0.0f;
+	currentPointIndex = 0;
+
+	setupGUI();
+	this->gui->setVisible( false );
+
+	//gui->setVisible( true );
 
 	setupIdea(*getPointCount() );
 	this->state = RUNNING;
@@ -120,7 +129,7 @@ void ComputerComputerState::update()
 
 void ComputerComputerState::draw()
 {
-	
+	ofBackground( 0 );
 	beforeDrawing();
 	setupColors();
 
@@ -195,6 +204,9 @@ void ComputerComputerState::keyPressed( int key )
 			ofShowCursor(); 
 		else
 			ofHideCursor();
+		break;
+	case 't':
+		warper.save();
 		break;
 	}
 }

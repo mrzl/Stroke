@@ -63,6 +63,7 @@ protected:
 	ofxQuadWarp         warper;
 	ofFbo               fbo;
 	bool isCursorVisible;
+	void initWarping();
 
 private:
 	float pointNum;

@@ -1,32 +1,48 @@
 #include "HumanHumanState.h"
 #include "SharedData.h"
 
-void HumanHumanState::stateEnter()
+HumanHumanState::HumanHumanState()
 {
-	BaseStrokeState::setupPointCount( 100 );
-	this->state = INIT;
-	this->allowParallels = true;
-	animationSpeed = 0.0f;
-	*this->getPointCount() = 200;
-	currentPointIndex = 0;
-	currentDrawingIndex = 0;
-	currentMouseDataIndex = 0;
 	this->currentMouseImportExportIndex = currentPointsImportExportIndex = 0;
-	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
 	fbo.allocate( ofGetWindowWidth(), ofGetWindowHeight() );
+
 	warper.setSourceRect( ofRectangle( 0, 0, ofGetWindowWidth(), ofGetWindowHeight() ) );              // this is the source rectangle which is the size of the image and located at ( 0, 0 )
 	warper.setTopLeftCornerPosition( ofPoint( 0, 0 ) );             // this is position of the quad warp corners, centering the image on the screen.
 	warper.setTopRightCornerPosition( ofPoint( ofGetWindowWidth(), 0 ) );        // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomLeftCornerPosition( ofPoint( 0, ofGetWindowHeight() ) );      // this is position of the quad warp corners, centering the image on the screen.
 	warper.setBottomRightCornerPosition( ofPoint( ofGetWindowWidth(), ofGetWindowHeight() ) ); // this is position of the quad warp corners, centering the image on the screen.
 	warper.setup();
+}
+
+HumanHumanState::~HumanHumanState()
+{
+
+}
+
+
+void HumanHumanState::stateEnter()
+{
+	BaseStrokeState::setupPointCount( 100 );
+	this->state = INIT;
+	this->allowParallels = true;
+	animationSpeed = 1.0f;
+	*this->getPointCount() = 200;
+	currentPointIndex = 0;
+	currentDrawingIndex = 0;
+	currentMouseDataIndex = 0;
+	this->currentMouse = ofVec2f( ofGetWindowWidth() / 2, ofGetWindowHeight() / 2 );
+	
 	//if( this->data.mouseData.empty() )
 	{
 		this->state = INIT;
 	}
 
 	setupGUI();
-	this->gui->setVisible( true );
+	this->gui->setVisible( false );
+	//this->gui->setVisible( true );
+	this->importPointData();
+	this->importMouseData();
+	this->state = DONE;
 }
 
 void HumanHumanState::stateExit()
@@ -71,7 +87,7 @@ void HumanHumanState::setupGUI()
 	gui->addLabelButton( this->allowParallelsButtonLabel, false );
 	gui->addSpacer();
 
-	gui->addSlider( "ANIMATIONSPEED", 0.7f, 50, &animationSpeed );
+	gui->addSlider( "ANIMATIONSPEED", animationSpeed, 50, &animationSpeed );
 	gui->addSpacer();
 
 	std::vector<std::string> stateNames;
@@ -223,7 +239,7 @@ void HumanHumanState::draw()
 		if( currentMouseDataIndex > 0)
 		{
 			ofVec2f from = this->currentData.pointData.at( currentDrawingIndex );
-			std::cout << this->currentData.currMouseData.size() << " " << this->currentData.currMouseData.at(currentDrawingIndex).size() << " " << this->currentData.pointData.size() << std::endl;
+			//std::cout << this->currentData.currMouseData.size() << " " << this->currentData.currMouseData.at(currentDrawingIndex).size() << " " << this->currentData.pointData.size() << std::endl;
 			ofVec2f to = this->currentData.currMouseData.at( currentDrawingIndex ).at( currentMouseDataIndex - 1 );
 			from.limited( from.length() - 2 );
 			from += (to - from).getNormalized() * 2 / 2;
@@ -241,8 +257,7 @@ void HumanHumanState::draw()
 				currentDrawingIndex = 0;
 				//currentMouseImportExportIndex++;
 				//currentPointsImportExportIndex++;
-				importPointData();
-				importMouseData();
+				end();
 			}
 			currentMouseDataIndex = 0;
 		}
@@ -273,5 +288,5 @@ ofVec2f HumanHumanState::getCurrentMouse()
 
 void HumanHumanState::end()
 {
-
+	changeState( getSharedData().HUMAN_COMPUTER );
 }
